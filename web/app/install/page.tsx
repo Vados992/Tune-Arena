@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { detectLanguage } from "@/lib/locale";
+import { detectInstallPlatform } from "@/lib/install-platform.mjs";
 import InstallClient from "./install-client";
 
 export const dynamic = "force-dynamic";
@@ -7,5 +8,5 @@ export const metadata = { title: "Install Tune Arena", description: "Install Tun
 
 export default async function InstallPage() {
   const h = await headers();
-  return <InstallClient initialLanguage={detectLanguage(h.get("cf-ipcountry"), h.get("accept-language"))}/>;
+  return <InstallClient initialLanguage={detectLanguage(h.get("cf-ipcountry"), h.get("accept-language"))} initialPlatform={detectInstallPlatform(h.get("user-agent") ?? "")}/>;
 }

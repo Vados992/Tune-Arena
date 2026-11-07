@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowUpRight, Check, Download, Globe2, Laptop, Smartphone, Wifi } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, ArrowUpRight, Check, Copy, Download, Globe2, Info, Laptop, Share2, Smartphone, Wifi, X } from "lucide-react";
 import { language, type Locale } from "@/lib/locale";
+import { detectInstallPlatform, installAction } from "@/lib/install-platform.mjs";
+import { installHelp } from "./install-help";
 import "./install.css";
 
 const copy = {
@@ -14,16 +16,26 @@ const copy = {
   fr: { back:"Retour à l’arène",tag:"TON GARAGE. PARTOUT.",title:"Une arène. Tous les écrans.",intro:"Tes projets, ton club et le prochain concours. Ouvre Tune Arena dans ton navigateur ou ajoute-la comme application sur ton appareil.",install:"Installer Tune Arena",open:"Ouvrir l’application",installed:"Application installée",hint:"Choisis ton appareil ci-dessous. Si l’installation est disponible, le navigateur demandera confirmation.",ios:["Ouvre cette page dans Safari.","Choisis Partager → Sur l’écran d’accueil.","Active l’ouverture comme app web si proposée, puis touche Ajouter."],android:["Ouvre cette page dans Chrome.","Touche Installer ci-dessus ou choisis Installer l’application / Ajouter à l’écran d’accueil dans le menu.","Confirme et ouvre Tune Arena depuis l’écran d’accueil."],desktop:["Ouvre cette page dans Chrome ou Edge.","Touche Installer ci-dessus ou installe la page comme application depuis le menu.","Ouvre Tune Arena dans ta liste d’applications."],web:"Fonctionne dans un navigateur moderne. L’installation dépend du navigateur et de la version du système.",online:"Les concours, photos et votes nécessitent internet.",account:"La consultation est publique. Connecte-toi pour publier ou voter. Cette version propose ChatGPT ; email et Telegram nécessitent une configuration.",apk:"APK de test Android",apkNote:"Version de test facultative, Android 8+. Compilation et lint réussis ; installation et caméra à vérifier sur appareil réel. Ce n’est pas une version Google Play.",apkButton:"Télécharger l’APK de test",checksum:"Empreinte SHA-256",footer:"Auteur : Vadym Tsinderhoz · Tous droits réservés",cancel:"La fenêtre d’installation a été fermée. Réessaie ou suis les instructions du navigateur."},
 };
 type InstallEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
+type Platform = ReturnType<typeof detectInstallPlatform>;
 
-export default function InstallClient({ initialLanguage }: { initialLanguage: Locale }) {
+export default function InstallClient({ initialLanguage, initialPlatform = "desktop" }: { initialLanguage: Locale; initialPlatform?: Platform }) {
   const [locale, setLocale] = useState(initialLanguage);
   const [prompt, setPrompt] = useState<InstallEvent | null>(null);
   const [installed, setInstalled] = useState(false);
   const [notice, setNotice] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [device, setDevice] = useState<Platform>(initialPlatform);
+  const [guide, setGuide] = useState<Platform | null>(null);
+  const [installUrl, setInstallUrl] = useState("");
+  const [copyStatus, setCopyStatus] = useState<"copied" | "manual" | null>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const linkField = useRef<HTMLInputElement>(null);
   const t = copy[locale];
+  const h = installHelp[locale];
   useEffect(() => {
     try { const saved = language(localStorage.getItem("ta_language") ?? ""); if (saved) setLocale(saved); } catch {}
+    setDevice(detectInstallPlatform(navigator.userAgent, navigator.maxTouchPoints));
+    setInstallUrl(window.location.origin + "/install");
     setInstalled(window.matchMedia("(display-mode: standalone)").matches || (navigator as Navigator & { standalone?: boolean }).standalone === true);
     const ready = (event: Event) => { event.preventDefault(); setPrompt(event as InstallEvent); };
     const done = () => { setInstalled(true); setPrompt(null); };
@@ -32,8 +44,19 @@ export default function InstallClient({ initialLanguage }: { initialLanguage: Lo
     return () => { window.removeEventListener("beforeinstallprompt", ready); window.removeEventListener("appinstalled", done); };
   }, []);
   useEffect(() => { document.documentElement.lang = locale; }, [locale]);
+  useEffect(() => {
+    const modal = dialog.current;
+    if (!modal) return;
+    if (guide && !modal.open) modal.showModal();
+    if (!guide && modal.open) modal.close();
+  }, [guide]);
+  function openGuide(platform: Platform) { setCopyStatus(null); setGuide(platform); }
+  async function copyLink() {
+    try { await navigator.clipboard.writeText(installUrl); setCopyStatus("copied"); }
+    catch { linkField.current?.focus(); linkField.current?.select(); setCopyStatus("manual"); }
+  }
   async function install() {
-    if (!prompt) { document.getElementById("device-install")?.scrollIntoView({ behavior: "smooth" }); return; }
+    if (installAction(device, !!prompt) === "guide" || !prompt) { openGuide(device); return; }
     setBusy(true); setNotice(false);
     try { await prompt.prompt(); const result = await prompt.userChoice; if (result.outcome !== "accepted") setNotice(true); }
     catch { setNotice(true); }
@@ -43,16 +66,24 @@ export default function InstallClient({ initialLanguage }: { initialLanguage: Lo
     <nav className="install-nav"><a href="/" className="brand"><span className="mark">T</span><span>TUNE<span className="brand-accent">ARENA</span></span></a><a href="/" className="install-back"><ArrowLeft size={16}/>{t.back}</a></nav>
     <section className="install-hero">
       <div><p className="eyebrow">{t.tag}</p><h1>{t.title}</h1><p className="install-intro">{t.intro}</p>
-        <div className="install-actions">{installed ? <a className="primary" href="/"><Check size={19}/>{t.open}</a> : <button className="primary" type="button" disabled={busy} onClick={() => void install()}><Download size={19}/>{t.install}</button>}<a className="outline" href="/"><Globe2 size={18}/>{t.open}<ArrowUpRight size={15}/></a></div>
-        <p className="install-hint" role="status">{notice ? t.cancel : installed ? t.installed : t.hint}</p>
+        <div className="install-actions">{installed ? <a className="primary" href="/"><Check size={19}/>{t.open}</a> : <button className="primary" type="button" disabled={busy} onClick={() => void install()}>{device === "ios" ? <Share2 size={19}/> : prompt ? <Download size={19}/> : <Info size={19}/>} {device === "ios" ? h.iosAction : prompt ? t.install : h.manualAction}</button>}<a className="outline" href="/"><Globe2 size={18}/>{t.open}<ArrowUpRight size={15}/></a></div>
+        <p className="install-hint" role="status">{notice ? t.cancel : installed ? t.installed : device === "ios" ? h.iosHint : prompt ? t.hint : h.manualHint}</p>
       </div>
       <div className="install-emblem" aria-hidden="true"><div className="install-orbit"/><img src="/icons/icon-512.png" alt="" width="512" height="512"/><span>iOS · Android · Windows · macOS</span></div>
     </section>
     <section id="device-install" className="install-devices" aria-label={t.install}>
-      {[{ title:"iPhone / iPad", icon:Smartphone, steps:t.ios },{ title:"Android", icon:Smartphone, steps:t.android },{ title:"Windows / Mac", icon:Laptop, steps:t.desktop }].map(({title,icon:Icon,steps}) => <article className="install-device" key={title}><Icon size={26}/><h2>{title}</h2><ol>{steps.map(step => <li key={step}>{step}</li>)}</ol></article>)}
+      {([{ platform:"ios", title:"iPhone / iPad", icon:Smartphone, steps:t.ios },{ platform:"android", title:"Android", icon:Smartphone, steps:t.android },{ platform:"desktop", title:"Windows / Mac", icon:Laptop, steps:t.desktop }] as const).map(({platform,title,icon:Icon,steps}) => <article className="install-device" key={title}><Icon size={26}/><h2>{title}</h2><ol>{steps.map(step => <li key={step}>{step}</li>)}</ol><button className="install-device-help" type="button" onClick={() => openGuide(platform)} aria-label={h.show + ": " + title}>{h.show}<ArrowUpRight size={15}/></button></article>)}
     </section>
     <section className="install-information"><p><Globe2 size={18}/>{t.web}</p><p><Wifi size={18}/>{t.online}</p><p>{t.account}</p></section>
-    <section className="install-apk"><div><p className="eyebrow">ANDROID · 1.0.0 · TEST BUILD</p><h2>{t.apk}</h2><p>{t.apkNote}</p></div><div><a className="outline" href="/downloads/Tune-Arena-1.0.0-debug.apk" download><Download size={18}/>{t.apkButton}</a><a className="install-checksum" href="/downloads/SHA256SUMS.txt">{t.checksum}</a></div></section>
+    {device !== "ios" && <section className="install-apk"><div><p className="eyebrow">ANDROID · 1.0.0 · TEST BUILD</p><h2>{t.apk}</h2><p>{t.apkNote}</p></div><div><a className="outline" href="/downloads/Tune-Arena-1.0.0-debug.apk" download><Download size={18}/>{t.apkButton}</a><a className="install-checksum" href="/downloads/SHA256SUMS.txt">{t.checksum}</a></div></section>}
     <footer className="install-footer">{t.footer}</footer>
+    <dialog ref={dialog} className="install-guide" aria-labelledby="install-guide-title" onClose={() => setGuide(null)} onCancel={() => setGuide(null)}>
+      <button className="install-guide-close" type="button" onClick={() => setGuide(null)} aria-label={h.close}><X size={21}/></button>
+      {guide && <><div className="install-guide-icon">{guide === "ios" ? <Share2 size={28}/> : <Smartphone size={28}/>}</div><h2 id="install-guide-title">{guide === "ios" ? h.iosTitle : h.title}</h2>
+        {guide === "ios" && <p className="install-guide-intro">{h.embedded}</p>}
+        <ol className="install-guide-steps">{(guide === "ios" ? t.ios : guide === "android" ? t.android : t.desktop).map((step, index) => <li key={step}><span>{index + 1}</span><p>{step}</p></li>)}</ol>
+        {guide === "ios" && <><p className="install-guide-note">{h.iosMissing}</p><label className="install-guide-link">{h.link}<input ref={linkField} type="url" readOnly value={installUrl} onFocus={event => event.currentTarget.select()}/></label><button className="outline" type="button" onClick={() => void copyLink()}><Copy size={17}/>{h.copy}</button><p role="status" className="install-guide-copy-status">{copyStatus === "copied" ? h.copied : copyStatus === "manual" ? h.manualCopy : ""}</p></>}
+      </>}
+    </dialog>
   </main>;
 }

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import vm from "node:vm";
 import { test } from "node:test";
+import { detectInstallPlatform, installAction } from "../lib/install-platform.mjs";
 
 const source = readFileSync(new URL("../public/sw.js", import.meta.url), "utf8");
 function worker(network = async () => new Response("live account page")) {
@@ -52,4 +53,23 @@ test("live pages always use network; offline public navigation gets static help"
   assert.equal(await (await live.request("/")).text(), "live account page");
   const offline = worker(async () => { throw new Error("network unavailable"); });
   for (const path of ["/", "/install", "/winners"]) assert.equal(await (await offline.request(path)).text(), "public offline help");
+});
+
+test("iPhone Safari, embedded iPhone browsers and iPad desktop mode get iOS instructions", () => {
+  const safari = "Mozilla/5.0 (iPhone; CPU iPhone OS 27_2 like Mac OS X) AppleWebKit/605.1.15 Version/27.2 Mobile/15E148 Safari/604.1";
+  const embedded = "Mozilla/5.0 (iPhone; CPU iPhone OS 27_2 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 ChatGPT";
+  const chrome = "Mozilla/5.0 (iPhone; CPU iPhone OS 27_2 like Mac OS X) AppleWebKit/605.1.15 CriOS/145.0.0.0 Mobile/15E148 Safari/604.1";
+  for (const ua of [safari, embedded, chrome]) assert.equal(detectInstallPlatform(ua), "ios");
+  assert.equal(detectInstallPlatform("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15 Safari/605.1.15", 5), "ios");
+});
+test("desktop Mac/Windows and Android are not mistaken for iPhone", () => {
+  assert.equal(detectInstallPlatform("Mozilla/5.0 (Macintosh; Intel Mac OS X 15_0) AppleWebKit/605.1.15 Version/27 Safari/605.1.15", 0), "desktop");
+  assert.equal(detectInstallPlatform("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/145 Safari/537.36", 0), "desktop");
+  assert.equal(detectInstallPlatform("Mozilla/5.0 (Linux; Android 16) Chrome/145 Mobile Safari/537.36", 5), "android");
+});
+test("unsupported install buttons always open a guide; iOS never invokes a programmatic prompt", () => {
+  for (const platform of ["ios", "android", "desktop"]) assert.equal(installAction(platform, false), "guide");
+  assert.equal(installAction("ios", true), "guide");
+  assert.equal(installAction("android", true), "prompt");
+  assert.equal(installAction("desktop", true), "prompt");
 });
