@@ -1,0 +1,27 @@
+.install-shell{max-width:1080px;padding:26px 30px 38px;margin:0 auto;color:#e9eef6}
+.install-nav{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.install-back{display:flex;align-items:center;gap:7px;font-size:12px;color:#9ba8bd}
+.install-hero{display:grid;grid-template-columns:1.4fr 1fr;gap:45px;align-items:center;padding:82px 0 54px}
+.install-hero .eyebrow{color:#ff9758;font-size:10px;letter-spacing:.16em}
+.install-hero h1{font-size:clamp(42px,5.6vw,70px);letter-spacing:-.055em;line-height:1.04;margin:17px 0 22px;font-weight:850;max-width:650px}
+.install-intro{color:#a6b2c4;font-size:16px;line-height:1.8;max-width:510px}
+.install-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}
+.install-actions .primary,.install-actions .outline,.install-apk .outline{display:inline-flex;align-items:center;justify-content:center;gap:9px;text-decoration:none;min-height:46px;font-size:12px}
+.install-hint{font-size:11px;color:#8391a7;line-height:1.6;margin-top:15px;max-width:470px;min-height:36px}
+.install-emblem{position:relative;isolation:isolate;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:330px}
+.install-emblem img{width:175px;height:175px;border-radius:37px;box-shadow:0 28px 80px #0009;transform:rotate(-8deg);z-index:1}
+.install-emblem span{margin-top:35px;font-size:10px;letter-spacing:.08em;color:#8190a6}
+.install-orbit{position:absolute;inset:0;background:radial-gradient(ellipse at center,#f7773020,transparent 65%);border:1px solid #ff97581c;border-radius:50%;transform:rotate(-20deg) scale(.85)}
+.install-orbit::before{content:"";position:absolute;inset:26px;border:1px solid #ff97581c;border-radius:50%}
+.install-devices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px;scroll-margin-top:20px}
+.install-device{border:1px solid #283243;background:linear-gradient(140deg,#19202c,#121823);border-radius:19px;padding:25px 24px}
+.install-device>svg{color:#f29154}.install-device h2{font-size:18px;font-weight:750;margin:20px 0 16px;letter-spacing:-.02em}
+.install-device ol{padding-left:19px;color:#a7b3c5;font-size:12px;line-height:1.8}.install-device li+li{margin-top:11px}.install-device li::marker{color:#ed915a}
+.install-information{padding:25px 4px;font-size:11px;color:#8290a5;line-height:1.75}
+.install-information p{display:flex;gap:9px;align-items:flex-start;max-width:900px;margin:9px 0}.install-information svg{flex-shrink:0;margin-top:2px}
+.install-apk{display:flex;justify-content:space-between;align-items:center;gap:35px;padding:26px 28px;background:#151c27;border:1px solid #293343;border-radius:18px}
+.install-apk .eyebrow{font-size:8px;color:#b98768;letter-spacing:.12em}.install-apk h2{margin:10px 0;font-size:20px;letter-spacing:-.025em}
+.install-apk p:not(.eyebrow){max-width:650px;line-height:1.8;font-size:11px;color:#929fb3}.install-apk>div:last-child{flex-shrink:0;text-align:center}
+.install-checksum{display:block;color:#8d9bb0;font-size:10px;text-decoration:underline;margin-top:14px}.install-footer{padding:32px 0 0;font-size:10px;color:#58677e}
+@media(max-width:760px){.install-shell{padding:19px 20px 30px}.install-nav .brand{font-size:20px}.install-back{font-size:10px;max-width:120px}.install-hero{padding:47px 0 27px;grid-template-columns:1fr;gap:0}.install-hero h1{max-width:560px;font-size:53px}.install-emblem{display:none}.install-intro{font-size:14px}.install-devices{grid-template-columns:1fr}.install-device{padding:23px}.install-device h2{margin-top:15px}.install-apk{align-items:flex-start;flex-direction:column;gap:17px;padding:23px}.install-apk>div:last-child{text-align:left;width:100%}.install-apk .outline{width:100%}.install-checksum{text-align:center}}
+@media(prefers-reduced-motion:reduce){.install-shell *{scroll-behavior:auto!important}}

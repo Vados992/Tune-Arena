@@ -22,7 +22,7 @@ const text={
   reset:"Show all builds|Mostrar todos|Mostrar todos|Показать все работы|Показати всі роботи|Tout afficher",
   culture:"BUILDS. PEOPLE. CULTURE.|PROJETOS. PESSOAS. CULTURA.|PROYECTOS. PERSONAS. CULTURA.|ПРОЕКТЫ. ЛЮДИ. КУЛЬТУРА.|ПРОЄКТИ. ЛЮДИ. КУЛЬТУРА.|PROJETS. PASSION. CULTURE.",
   explore:"Explore the garage|Explorar a garagem|Explorar el garaje|Загляни в Гараж|Зазирни в Гараж|Explore le Garage",
-  pilot:"Private tuning community|Comunidade privada de tuning|Comunidad privada de tuning|Приватное тюнинг-сообщество|Приватна тюнінг-спільнота|Communauté tuning privée",
+  pilot:"Tuning community|Comunidade de tuning|Comunidad de tuning|Тюнинг-сообщество|Тюнінг-спільнота|Communauté tuning",
   back:"Back to feed|Voltar ao feed|Volver al feed|Вернуться в ленту|Повернутися у стрічку|Retour au fil",
   roundStats:"This round|Esta ronda|Esta ronda|В этом раунде|У цьому раунді|Cette manche",
 } as const;

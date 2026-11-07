@@ -14,7 +14,7 @@
     "db:generate": "drizzle-kit generate",
     "local:setup": "node scripts/setup-local.mjs",
     "db:local": "node scripts/migrate-local.mjs",
-    "test": "node tests/arena_flow.mjs && python3 tests/contest_rules.py",
+    "test": "node tests/arena_flow.mjs && python3 tests/contest_rules.py && node --test tests/pwa.test.mjs",
     "typecheck": "tsc --noEmit",
     "deploy": "node scripts/prepare-cloudflare.mjs && wrangler deploy --config dist/server/wrangler.deploy.json",
     "deploy:prepare": "node scripts/prepare-cloudflare.mjs",

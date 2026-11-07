@@ -9,7 +9,7 @@ import ClubPanel, { ClubReward } from "./club-panel";
 import type { Club } from "@/lib/referrals";
 import { socialText } from "@/lib/social-strings";
 import PhotoPicker from "./photo-picker";
-import { Home, Flame, Trophy, UserRound, Users, Search, Plus, Heart, ThumbsDown, Send, ArrowUpRight, Timer, ShieldCheck, Camera, Crown, Flag, ChevronRight, X } from "lucide-react";
+import { Home, Flame, Trophy, UserRound, Users, Search, Plus, Heart, ThumbsDown, Send, ArrowUpRight, Timer, ShieldCheck, Camera, Crown, Flag, ChevronRight, X, Download } from "lucide-react";
 
 type Credit={author:string;source:string;license:string;terms?:string};
 type Entry={id:string;name:string;description:string;image:string;likes:number;liked:boolean;dislikes:number;disliked:boolean;mine:boolean;sample:boolean;frame:string;gift:number;nickname:string|null;created:number;credit?:Credit};
@@ -167,6 +167,7 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
       <a href="/" className="brand"><span className="mark" aria-hidden="true">T</span><span>TUNE<span className="brand-accent">ARENA</span></span></a>
       <label className="social-search"><Search size={18}/><input type="search" aria-label={st.search} placeholder={st.search} value={search} onChange={e=>{setSearch(e.target.value);setTab("feed");}}/></label>
       <div className="header-actions"><select aria-label={t("language")} value={locale} onChange={e=>changeLocale(e.target.value)}>{languages.map(l=><option value={l} key={l}>{labels[l]}</option>)}</select>
+        <a className="install-header-link" href="/install" aria-label={t("install")} title={t("install")}><Download size={19}/></a>
         <button className={"avatar header-user "+(profile?.frame??"plain")} onClick={()=>navigate("profile")} aria-label={t("profile")}>{profile?.nickname?.slice(0,1).toUpperCase()??<UserRound size={19}/>}</button></div>
     </header>
     <div className="social-layout">
@@ -174,6 +175,7 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
       <p className="rail-label">{st.culture}</p>
       <nav aria-label="Tune Arena">{sections.map(n=>{const Icon=navIcons[n];return <button type="button" key={n} aria-current={tab===n?"page":undefined} onClick={()=>navigate(n)}><Icon size={22}/>{n==="feed"?st.feed:t(n)}{tab===n&&<span className="nav-dot"/>}</button>;})}
         <a href="/winners"><Trophy size={22}/>{t("winners")}</a>
+        <a href="/install"><Download size={22}/>{t("install")}</a>
         <button type="button" onClick={()=>navigate("profile")}><Users size={22}/>{st.club}</button>
         {data.admin&&<a href="/admin"><ShieldCheck size={22}/>{t("admin")}</a>}
       </nav>

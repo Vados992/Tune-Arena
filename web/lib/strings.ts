@@ -1,6 +1,7 @@
 import { languages, type Locale } from "./locale";
 const copy = {
-  pilot:"PRIVATE PILOT|PILOTO PRIVADO|PILOTO PRIVADO|ПРИВАТНЫЙ ПИЛОТ|ПРИВАТНИЙ ПІЛОТ|PILOTE PRIVÉ",
+  pilot:"TUNING COMMUNITY|COMUNIDADE TUNING|COMUNIDAD TUNING|ТЮНИНГ-СООБЩЕСТВО|ТЮНІНГ-СПІЛЬНОТА|COMMUNAUTÉ TUNING",
+  install:"Install app|Instalar aplicação|Instalar aplicación|Установить приложение|Встановити застосунок|Installer l’application",
   kicker:"COMMUNITY TUNING CONTEST|CONCURSO DE TUNING|CONCURSO DE TUNING|КОНКУРС АВТОТЮНИНГА|КОНКУРС АВТОТЮНІНГУ|CONCOURS DE TUNING",
   line1:"Your build.|O teu projeto.|Tu proyecto.|Твой проект.|Твій проєкт.|Ton projet.",
   line2:"Their vote.|O voto da comunidade.|Su voto.|Их голос.|Їхній голос.|Leur vote.",
