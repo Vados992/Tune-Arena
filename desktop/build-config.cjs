@@ -1,0 +1,1 @@
+module.exports={appId:"com.tsinderhoz.tunearena",productName:"Tune Arena",asar:true,directories:{output:"dist",buildResources:"build"},files:["main.cjs","policy.cjs","server.json","settings*","offline.html","package.json"],extraMetadata:{author:"Vadym Tsinderhoz"},forceCodeSigning:process.env.TUNE_SIGNED_RELEASE==="1",linux:{icon:"build/icon.png"}};

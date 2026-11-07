@@ -1,0 +1,12 @@
+import {readFileSync,writeFileSync}from "node:fs";
+import path from "node:path";
+const id=process.env.TUNE_D1_DATABASE_ID,bucket=process.env.TUNE_R2_BUCKET_NAME,appUrl=process.env.TUNE_APP_ORIGIN;
+if(!/^[a-f0-9-]{36}$/i.test(id??"")||!bucket||!appUrl)throw new Error("Set TUNE_D1_DATABASE_ID, TUNE_R2_BUCKET_NAME and TUNE_APP_ORIGIN; see docs/DEPLOYMENT_RU.md");
+const u=new URL(appUrl);if(u.protocol!=="https:"||u.username||u.password||u.search||u.hash||!["/", ""].includes(u.pathname))throw new Error("TUNE_APP_ORIGIN must be an HTTPS origin");
+const config=JSON.parse(readFileSync("dist/server/wrangler.json","utf8"));
+config.name=process.env.TUNE_WORKER_NAME??"tune-arena";
+config.d1_databases=[{binding:"DB",database_name:"tune-arena",database_id:id,migrations_dir:path.resolve("drizzle")}];
+config.r2_buckets=[{binding:"BUCKET",bucket_name:bucket}];
+config.vars={ENVIRONMENT:"production",TRUST_SITE_AUTH:"0",APP_ORIGIN:u.origin,...(process.env.TUNE_ADMIN_EMAIL?{TUNE_ADMIN_EMAIL:process.env.TUNE_ADMIN_EMAIL}:{})};
+writeFileSync("dist/server/wrangler.deploy.json",JSON.stringify(config,null,2));
+console.log("Prepared standalone production Worker configuration; development sign-in is disabled.");

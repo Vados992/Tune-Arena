@@ -1,0 +1,16 @@
+plugins { id 'com.android.application' }
+android {
+    namespace 'com.tsinderhoz.tunearena'
+    compileSdk 36
+    defaultConfig { applicationId 'com.tsinderhoz.tunearena'; minSdk 26; targetSdk 36; versionCode 10000; versionName '1.0.0' }
+    buildFeatures { buildConfig true }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    def signingPath = System.getenv('ANDROID_KEYSTORE_PATH')
+    if (signingPath) {
+        signingConfigs { release { storeFile file(signingPath); storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD'); keyAlias System.getenv('ANDROID_KEY_ALIAS'); keyPassword System.getenv('ANDROID_KEY_PASSWORD') } }
+    }
+    buildTypes {
+        debug { applicationIdSuffix '.debug'; versionNameSuffix '-debug' }
+        release { minifyEnabled false; if(signingPath) signingConfig signingConfigs.release }
+    }
+}

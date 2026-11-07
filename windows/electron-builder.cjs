@@ -1,0 +1,2 @@
+const base=require("../desktop/build-config.cjs");
+module.exports={...base,directories:{...base.directories,output:"dist/windows"},win:{target:[{target:"nsis",arch:["x64"]},{target:"portable",arch:["x64"]}],icon:"build/icon.ico"},nsis:{oneClick:false,allowToChangeInstallationDirectory:true,perMachine:false,artifactName:"Tune-Arena-Setup-${version}-${arch}.${ext}"},portable:{artifactName:"Tune-Arena-Portable-${version}-${arch}.${ext}"}};

@@ -1,0 +1,20 @@
+{
+  "name": "tune-arena-desktop",
+  "version": "1.0.0",
+  "description": "Tune Arena connected desktop client for macOS and Windows",
+  "author": "Vadym Tsinderhoz",
+  "license": "UNLICENSED",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/policy.test.cjs",
+    "build:mac": "electron-builder --config ../macos/electron-builder.cjs --publish never",
+    "build:win": "electron-builder --config ../windows/electron-builder.cjs --publish never",
+    "pack:linux": "electron-builder --linux dir --config build-config.cjs --publish never"
+  },
+  "devDependencies": {
+    "electron": "45.2.3",
+    "electron-builder": "26.18.0"
+  }
+}

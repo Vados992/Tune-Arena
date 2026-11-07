@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1793967055351,
+      "tag": "0000_third_radioactive_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1793968736016,
+      "tag": "0001_zippy_mattie_franklin",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793970064494,
+      "tag": "0002_striped_mandrill",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1794054486292,
+      "tag": "0003_lumpy_shaman",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1794055857507,
+      "tag": "0004_burly_senator_kelly",
+      "breakpoints": true
+    }
+  ]
+}
