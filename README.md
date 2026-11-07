@@ -63,6 +63,8 @@ npm run configure -- https://your-app.example
 
 GitHub Actions: [проверки](.github/workflows/verify.yml) и [четыре платформенные сборки](.github/workflows/build-clients.yml). Вторая workflow создаёт тестовые macOS/Windows-пакеты без сертификатов, Android debug APK и unsigned AAB, iOS simulator app и unsigned device archive. Она не публикует приложение в магазины и не создаёт подписанный IPA без Apple Developer credentials.
 
+Первый облачный запуск 7 ноября остановился до выполнения шагов всех заданий; macOS/Windows/iOS-сборки пока не подтверждены. [Фактические результаты](docs/VERIFICATION.md). Android APK собран отдельно и доступен выше.
+
 ## Система и эксплуатация
 
 - [Архитектура и потоки данных](docs/ARCHITECTURE_RU.md)
