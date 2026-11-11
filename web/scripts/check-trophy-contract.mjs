@@ -1,0 +1,10 @@
+import {readFileSync,mkdirSync,writeFileSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import solc from 'solc';
+const require=createRequire(import.meta.url);
+const result=JSON.parse(solc.compile(JSON.stringify({language:'Solidity',sources:{'TuneArenaTrophy.sol':{content:readFileSync('contracts/TuneArenaTrophy.sol','utf8')}},settings:{optimizer:{enabled:true,runs:200},outputSelection:{'*':{'*':['abi','evm.bytecode.object']}}}}),{import:path=>{try{return {contents:readFileSync(require.resolve(path),'utf8')};}catch{return {error:'Missing import '+path};}}}));
+for(const error of result.errors??[])if(error.severity==='error')throw new Error(error.formattedMessage);
+const artifact=result.contracts['TuneArenaTrophy.sol'].TuneArenaTrophy;
+if(!artifact.abi.some(x=>x.name==='award')||!artifact.evm.bytecode.object)throw new Error('Missing contract ABI/bytecode');
+mkdirSync('contracts/artifacts',{recursive:true});writeFileSync('contracts/artifacts/TuneArenaTrophy.json',JSON.stringify({compiler:solc.version(),abi:artifact.abi,bytecode:'0x'+artifact.evm.bytecode.object},null,2));
+console.log('PASS: OpenZeppelin ERC721 trophy contract compiled with owner-restricted award function.');

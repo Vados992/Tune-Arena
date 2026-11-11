@@ -4,7 +4,7 @@ import { getChatGPTUser } from "@/app/chatgpt-auth";
 type Config = {
   DB: D1Database; BUCKET: R2Bucket; APP_ORIGIN?: string;
   TELEGRAM_CLIENT_ID?: string; TELEGRAM_CLIENT_SECRET?: string;
-  RESEND_API_KEY?: string; EMAIL_FROM?: string; TUNE_ADMIN_EMAIL?: string;
+  TUNE_ADMIN_EMAIL?: string; TUNE_ADMIN_TELEGRAM_ID?: string;
   TRUST_SITE_AUTH?:string; ENVIRONMENT?:string; LOCAL_DEV_AUTH?:string; LOCAL_DEV_ADMIN?:string;
 };
 export const config = env as unknown as Config;
@@ -22,7 +22,7 @@ export function localDevelopment(req?:Request) {
     return url.protocol==="http:"&&["localhost","127.0.0.1","[::1]"].includes(url.hostname)&&(!req||new URL(req.url).origin===url.origin);
   } catch {return false;}
 }
-export const cookieHeader = (name:string,value:string,age:number) => `${name}=${value}; Max-Age=${age}; Path=/; HttpOnly;${localDevelopment()?"":" Secure;"} SameSite=Lax`;
+export const cookieHeader = (name: string, value: string, age: number) => `${name}=${value}; Max-Age=${age}; Path=/; HttpOnly;${localDevelopment()?"":" Secure;"} SameSite=Lax`;
 export const json = (data: unknown, status = 200, headers: HeadersInit = {}) => Response.json(data,{status,headers:{"Cache-Control":"no-store",...headers}});
 export const failure = (code: string,status=400) => json({error:code},status);
 export function redirectTo(req: Request, path: string, cookies: string[] = []) {
@@ -32,30 +32,34 @@ export function redirectTo(req: Request, path: string, cookies: string[] = []) {
 }
 export async function currentUser(req: Request) {
   const platform = config.TRUST_SITE_AUTH==="1" ? await getChatGPTUser() : null;
-  if (platform) return "site:"+platform.userId;
+  if (platform) {
+    const id="site:"+platform.userId;
+    if(!await db().prepare("SELECT user_id FROM deleted_accounts WHERE user_id=?").bind(id).first())return id;
+  }
   const session = cookie(req,"ta_session");
   if (!/^[A-Za-z0-9_-]{43}$/.test(session)) return null;
-  const row = await db().prepare("SELECT user_id FROM sessions WHERE id=? AND expires>unixepoch()").bind(await digest(session)).first<{user_id:string}>();
+  const row = await db().prepare("SELECT user_id FROM sessions WHERE id=? AND expires>unixepoch() AND NOT EXISTS(SELECT 1 FROM deleted_accounts d WHERE d.user_id=sessions.user_id)").bind(await digest(session)).first<{user_id:string}>();
   return row?.user_id ?? null;
 }
 
-export async function isAdministrator(req?:Request) {
+// Only server-resolved identities may be passed here. Public nicknames grant no access.
+export async function isAdministrator(userId?:string|null) {
   if(config.TRUST_SITE_AUTH==="1") {
+    const platform=await getChatGPTUser();
     const expected=config.TUNE_ADMIN_EMAIL?.trim().toLowerCase();
-    const user=await getChatGPTUser();
-    if(user)return !!expected&&user.email.trim().toLowerCase()===expected;
+    if(platform&&expected&&platform.email.trim().toLowerCase()===expected) {
+      const id="site:"+platform.userId;
+      if(userId!==undefined&&userId!==id)return false;
+      return !await db().prepare("SELECT user_id FROM deleted_accounts WHERE user_id=?").bind(id).first();
+    }
   }
-  if(!req) {
+  if(userId===undefined) {
     const {headers}=await import("next/headers");
-    req=new Request(new URL("/",config.APP_ORIGIN??"https://internal.invalid"),{headers:await headers()});
+    userId=await currentUser(new Request(new URL("/",config.APP_ORIGIN??"https://internal.invalid"),{headers:await headers()}));
   }
-  const user=await currentUser(req);if(!user)return false;
-  if(localDevelopment(req)&&config.LOCAL_DEV_ADMIN==="1") {
-    const demo=await db().prepare("SELECT user_id FROM identities WHERE provider='dev' AND subject=? AND user_id=?")
-      .bind(await digest("dev:local-driver"),user).first();
-    if(demo)return true;
-  }
-  const expected=config.TUNE_ADMIN_EMAIL?.trim().toLowerCase();if(!expected)return false;
-  return !!await db().prepare("SELECT user_id FROM identities WHERE provider='email' AND subject=? AND user_id=?")
-    .bind(await digest("email:"+expected),user).first();
+  if(!userId||await db().prepare("SELECT user_id FROM deleted_accounts WHERE user_id=?").bind(userId).first())return false;
+  if(localDevelopment()&&config.LOCAL_DEV_ADMIN==="1"&&await db().prepare("SELECT user_id FROM identities WHERE provider='dev' AND subject=? AND user_id=?").bind(await digest("dev:local-driver"),userId).first())return true;
+  const expected=config.TUNE_ADMIN_TELEGRAM_ID?.trim();
+  if(!/^[1-9][0-9]{0,19}$/.test(expected??""))return false;
+  return !!await db().prepare("SELECT user_id FROM identities WHERE provider='telegram' AND subject=? AND user_id=?").bind(await digest("telegram:"+expected),userId).first();
 }

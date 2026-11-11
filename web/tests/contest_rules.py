@@ -21,8 +21,8 @@ class ContestRules(unittest.TestCase):
             ("test", "organizer", "test", 100, 200),
         ])
         self.conn.executemany("INSERT INTO entries(id,round_id,owner,name,description,media,created) VALUES(?,?,?,?,?,?,?)", [
-            ("a", "weekly", "author-a", "A", "original", "sample:a", 105),
-            ("b", "weekly", "author-b", "B", "original", "sample:b", 105),
+            ("a", "weekly", "author-a", "A", "original", "entries/a", 105),
+            ("b", "weekly", "author-b", "B", "original", "entries/b", 105),
             ("t", "test", "author-t", "T", "original", "sample:t", 106),
         ])
 

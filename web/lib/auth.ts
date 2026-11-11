@@ -1,17 +1,12 @@
 import { config, db, token, digest, now, origin, cookie, cookieHeader, failure, json, redirectTo, currentUser, localDevelopment } from "./worker";
 
 const telegram = "https://oauth.telegram.org";
-export const loginOptions = () => ({
-  chatgpt: config.TRUST_SITE_AUTH==="1",
-  local: localDevelopment(),
-  email: !!(config.RESEND_API_KEY && config.EMAIL_FROM && config.APP_ORIGIN),
-  telegram: !!(config.TELEGRAM_CLIENT_ID && config.TELEGRAM_CLIENT_SECRET && config.APP_ORIGIN),
-});
+export const loginOptions = () => ({...(localDevelopment()?{local:true}:{}),telegram: !!(config.TELEGRAM_CLIENT_ID && config.TELEGRAM_CLIENT_SECRET && config.APP_ORIGIN)});
 const validToken = /^[a-zA-Z0-9_-]{43}$/;
 const challengeCookie = "ta_auth";
 const sessionCookie = "ta_session";
 
-async function signIn(req: Request, provider: string, subject: string) {
+export async function signIn(req: Request, provider: string, subject: string) {
   const key = await digest(provider + ":" + subject);
   const current = await currentUser(req);
   const user = current ?? crypto.randomUUID();
@@ -23,34 +18,7 @@ async function signIn(req: Request, provider: string, subject: string) {
   const old = cookie(req,sessionCookie);
   if (validToken.test(old)) await db().prepare("DELETE FROM sessions WHERE id=?").bind(await digest(old)).run();
   await db().prepare("INSERT INTO sessions(id,user_id,expires) VALUES(?,?,?)").bind(await digest(session),identity.user_id,now()+ttl).run();
-  return redirectTo(req,"/",[cookieHeader(sessionCookie,session,ttl),cookieHeader(challengeCookie,"",0)]);
-}
-
-async function emailStart(req: Request) {
-  if (!loginOptions().email) return failure("provider_unavailable",503);
-  const body = await req.json().catch(()=>null) as Record<string,unknown> | null;
-  const email = typeof body?.email==="string" ? body.email.trim().toLowerCase() : "";
-  if (email.length>254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email)) return failure("invalid_email");
-  const proof=token(), browser=token(), id=await digest(proof), emailKey=await digest(email);
-  const client=await digest((await currentUser(req)) ?? req.headers.get("cf-connecting-ip") ?? "unknown");
-  await db().batch([
-    db().prepare("DELETE FROM auth_challenges WHERE expires < unixepoch()-3600"),
-    db().prepare("DELETE FROM sessions WHERE expires < unixepoch()"),
-  ]);
-  const added=await db().prepare(`INSERT INTO auth_challenges(id,kind,subject,browser,quota,secret,created,expires)
-    SELECT ?,'email',?,?,?,?,unixepoch(),unixepoch()+900
-    WHERE (SELECT count(*) FROM auth_challenges WHERE kind='email' AND secret=? AND created>unixepoch()-900)<3
-      AND (SELECT count(*) FROM auth_challenges WHERE kind='email' AND quota=? AND created>unixepoch()-900)<8`)
-    .bind(id,email,await digest(browser),client,emailKey,emailKey,client).run();
-  if (!added.meta.changes) return failure("rate_limited",429);
-  const link=new URL("/?confirm="+proof,origin(req)).href;
-  const sent=await fetch("https://api.resend.com/emails",{
-    method:"POST",headers:{Authorization:"Bearer "+config.RESEND_API_KEY,"Content-Type":"application/json"},
-    body:JSON.stringify({from:config.EMAIL_FROM,to:[email],subject:"Tune Arena — email sign-in",text:"Open this link in the same browser to sign in. It expires in 15 minutes.\n"+link}),
-    signal:AbortSignal.timeout(8000),
-  }).catch(()=>null);
-  if (!sent?.ok) return failure("provider_unavailable",503);
-  return json({ok:true},200,{"Set-Cookie":cookieHeader(challengeCookie,browser,900)});
+  return redirectTo(req,"/?garage=1",[cookieHeader(sessionCookie,session,ttl),cookieHeader(challengeCookie,"",0)]);
 }
 
 async function takeChallenge(req: Request, kind: string, proof: string) {
@@ -63,7 +31,7 @@ async function takeChallenge(req: Request, kind: string, proof: string) {
 }
 
 async function telegramStart(req: Request) {
-  if (!loginOptions().telegram) return failure("provider_unavailable",503);
+  if (!loginOptions().telegram) return redirectTo(req,"/?register=1&provider_unavailable=telegram");
   const state=token(), verifier=token(), browser=token();
   await db().prepare(`INSERT INTO auth_challenges(id,kind,subject,browser,quota,secret,created,expires)
     VALUES(?,'telegram','',?,'',?,unixepoch(),unixepoch()+600)`)
@@ -105,7 +73,7 @@ async function telegramSubject(jwt: string) {
 }
 
 async function telegramCallback(req: Request) {
-  if (!loginOptions().telegram) return failure("provider_unavailable",503);
+  if (!loginOptions().telegram) return redirectTo(req,"/?register=1&provider_unavailable=telegram");
   const query=new URL(req.url).searchParams;
   const code=query.get("code"), state=query.get("state");
   const challenge=state && code && code.length<2048 ? await takeChallenge(req,"telegram",state) : null;
@@ -140,14 +108,8 @@ export async function authRoute(req: Request, path: string) {
     if(validToken.test(session))await db().prepare("DELETE FROM sessions WHERE id=?").bind(await digest(session)).run();
     return redirectTo(req,"/",[cookieHeader(sessionCookie,"",0)]);
   }
-  if (req.method==="POST" && path==="auth/email") return emailStart(req);
-  if (req.method==="POST" && path==="auth/email/verify") {
-    if (!loginOptions().email) return failure("provider_unavailable",503);
-    const payload=await req.json().catch(()=>null) as Record<string,unknown> | null;
-    const challenge=typeof payload?.proof==="string" ? await takeChallenge(req,"email",payload.proof) : null;
-    return challenge ? signIn(req,"email",challenge.subject) : failure("expired",400);
-  }
-  if (req.method==="GET" && path==="auth/telegram") return telegramStart(req);
-  if (req.method==="GET" && path==="auth/telegram/callback") return telegramCallback(req);
+  if(req.method==="GET"&&path==="auth/options")return json(loginOptions());
+  if(req.method==="GET"&&path==="auth/telegram")return telegramStart(req);
+  if(req.method==="GET"&&path==="auth/telegram/callback")return telegramCallback(req);
   return failure("not_found",404);
 }

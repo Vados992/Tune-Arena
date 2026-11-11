@@ -16,13 +16,13 @@ export const qualifyReferrals = `
     AND EXISTS(SELECT 1 FROM profiles p WHERE p.id=invitee AND p.nickname IS NOT NULL)
     AND (EXISTS(
       SELECT 1 FROM entries e JOIN rounds r ON r.id=e.round_id
-      WHERE e.owner=referrals.invitee AND e.hidden=0 AND r.kind='weekly'
+      WHERE e.owner=referrals.invitee AND e.hidden=0 AND e.withdrawn=0 AND r.kind='weekly'
         AND e.media LIKE 'entries/%' AND e.created>=referrals.joined
         AND e.created>=r.opens AND e.created<r.closes
     ) OR (
       SELECT count(*) FROM votes v JOIN entries e ON e.id=v.entry_id
         JOIN rounds r ON r.id=e.round_id
-      WHERE v.voter=referrals.invitee AND v.value=1 AND e.hidden=0 AND r.kind='weekly'
+      WHERE v.voter=referrals.invitee AND v.value=1 AND e.hidden=0 AND e.withdrawn=0 AND r.kind='weekly'
         AND e.media LIKE 'entries/%' AND e.owner<>referrals.invitee
         AND e.owner<>referrals.inviter AND v.created>=referrals.joined
         AND v.created>=r.opens AND v.created<r.closes

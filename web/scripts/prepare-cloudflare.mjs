@@ -7,6 +7,6 @@ const config=JSON.parse(readFileSync("dist/server/wrangler.json","utf8"));
 config.name=process.env.TUNE_WORKER_NAME??"tune-arena";
 config.d1_databases=[{binding:"DB",database_name:"tune-arena",database_id:id,migrations_dir:path.resolve("drizzle")}];
 config.r2_buckets=[{binding:"BUCKET",bucket_name:bucket}];
-config.vars={ENVIRONMENT:"production",TRUST_SITE_AUTH:"0",APP_ORIGIN:u.origin,...(process.env.TUNE_ADMIN_EMAIL?{TUNE_ADMIN_EMAIL:process.env.TUNE_ADMIN_EMAIL}:{})};
+config.vars={ENVIRONMENT:"production",TRUST_SITE_AUTH:"0",APP_ORIGIN:u.origin,...(process.env.TUNE_ADMIN_TELEGRAM_ID?{TUNE_ADMIN_TELEGRAM_ID:process.env.TUNE_ADMIN_TELEGRAM_ID}:{})};
 writeFileSync("dist/server/wrangler.deploy.json",JSON.stringify(config,null,2));
 console.log("Prepared standalone production Worker configuration; development sign-in is disabled.");

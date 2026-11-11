@@ -18,3 +18,7 @@ Gallery photographs already used by the app:
 | TRD wheel | Tokumeigakarinoaoshima | CC0 1.0 | https://commons.wikimedia.org/wiki/File:The_tire_wheel_of_Toyota_86_(ZN6)_with_TRD_parts.JPG |
 
 The delivered gallery files are resized/cropped previews. The application displays the credit and license links. CC BY-SA terms continue to apply to the adapted photographs; they do not grant rights to the proprietary application code. Native app icons are deterministic geometric Tune Arena marks included in this repository.
+
+## Дополнения синхронизации v33
+
+В `web/package-lock.json` зафиксированы новые зависимости, включая ethers и OpenZeppelin для серверной проверки трофеев и компиляции ERC-721. См. лицензии установленных пакетов. Контракт находится в `web/contracts/`; его наличие не означает развёртывания в сети. Баннер выставки тюнинга перенесён из актуальных ресурсов сайта; прежние сведения об источниках демонстрационных фотографий сохранены.

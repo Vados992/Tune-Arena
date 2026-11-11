@@ -20,3 +20,7 @@ Primary implementation references:
 - https://docs.gradle.org/8.13/release-notes.html
 
 Gradle Wrapper JAR downloaded from the official Gradle v8.13.0 source and verified against the official wrapper checksum: `81a82aaea5abcc8ff68b3dfcb58b3c3c429378efd98e7433460610fecd7ae45f`.
+
+## Синхронизация 11 ноября 2026
+
+Текущий `web/` обновлён из Sites v33 (`3e2b45e7109cb0f831b5114e1e76237fbee66f56`). Оболочки четырёх платформ и Android-пакеты из GitHub-коммита `1d9aee85ad4f4de5cfc1d3dae2898ed4138fd30f` сохранены без изменений. Предыдущие разделы описывают первоначальный экспорт 7 ноября, а не текущие возможности интерфейса. Подробности и список адаптаций: [SITE_SYNC_RU.md](SITE_SYNC_RU.md).

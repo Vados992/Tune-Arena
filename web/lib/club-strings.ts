@@ -1,6 +1,7 @@
 import { languages, type Locale } from "./locale";
 const copy={
-  title:"Tuning club programme|Programa do clube de tuning|Programa del club tuning|Программа тюнинг-клуба|Програма тюнінг-клубу|Programme du club tuning",
+  friends:"friends|amigos|amigos|друзей|друзів|amis",
+  title:"Referrals|Convites|Referidos|Рефералка|Запрошення|Parrainage",
   subtitle:"Bring your crew. Upgrade your Garage.|Traz os teus amigos. Melhora a tua Garagem.|Trae a tus amigos. Mejora tu Garaje.|Собери свою команду. Прокачай Гараж.|Збери свою команду. Прокачай Гараж.|Invite ton équipe. Améliore ton Garage.",
   daysPremium:"days of Premium|dias de Premium|días de Premium|дней Премиума|днів Преміуму|jours de Premium",
   inviterPerk:"You: 30 days for 3 active friends|Tu: 30 dias por 3 amigos ativos|Tú: 30 días por 3 amigos activos|Тебе: 30 дней за 3 активных друзей|Тобі: 30 днів за 3 активних друзів|Toi : 30 jours pour 3 amis actifs",

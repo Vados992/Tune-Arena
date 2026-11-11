@@ -1,0 +1,9 @@
+APP_ORIGIN="http://localhost:5173"
+ENVIRONMENT="development"
+TRUST_SITE_AUTH="0"
+LOCAL_DEV_AUTH="1"
+LOCAL_DEV_ADMIN="1"
+# Production: use your verified Telegram numeric user ID, never a username.
+# TUNE_ADMIN_TELEGRAM_ID=""
+# TELEGRAM_CLIENT_ID=""
+# TELEGRAM_CLIENT_SECRET=""

@@ -1,0 +1,38 @@
+import { languages, type Locale } from "./locale";
+
+const copy = {
+  owner:"Owner|Proprietário|Propietario|Владелец|Власник|Propriétaire",
+  organizer:"Organizer|Organizador|Organizador|Организатор|Організатор|Organisateur",
+  heading:"Team access|Acesso da equipa|Acceso del equipo|Доступ организаторов|Доступ організаторів|Accès de l’équipe",
+  intro:"Only the owner grants access. Organizers manage assigned contests; financial settings remain with the owner.|Só o proprietário concede acesso. Os organizadores gerem concursos atribuídos; as finanças ficam com o proprietário.|Solo el propietario concede acceso. Los organizadores gestionan concursos asignados; las finanzas quedan con el propietario.|Только владелец выдаёт права. Организаторы управляют назначенными конкурсами; финансовые настройки остаются у владельца.|Лише власник надає права. Організатори керують призначеними конкурсами; фінансові налаштування залишаються у власника.|Seul le propriétaire accorde les accès. Les organisateurs gèrent les concours attribués; les finances restent au propriétaire.",
+  hint:"The person must sign in and choose a nickname first. Access is bound to their account, even if the nickname changes.|A pessoa deve iniciar sessão e escolher uma alcunha. O acesso fica associado à conta, mesmo mudando a alcunha.|La persona debe iniciar sesión y elegir un alias. El acceso queda vinculado a su cuenta aunque cambie el alias.|Человек должен сначала войти и выбрать никнейм. Права привязаны к аккаунту и сохраняются при смене никнейма.|Людина має спочатку увійти та обрати нікнейм. Права прив’язані до акаунта і зберігаються після зміни нікнейма.|La personne doit se connecter et choisir un pseudo. Les droits restent liés au compte même si le pseudo change.",
+  nickname:"Organizer nickname|Alcunha do organizador|Alias del organizador|Никнейм организатора|Нікнейм організатора|Pseudo de l’organisateur",
+  create:"Allow creating new contests|Permitir criar concursos|Permitir crear concursos|Разрешить создавать новые конкурсы|Дозволити створювати нові конкурси|Autoriser la création de concours",
+  grant:"Grant access|Conceder acesso|Conceder acceso|Выдать доступ|Надати доступ|Accorder l’accès",
+  revoke:"Revoke access|Revogar acesso|Revocar acceso|Отозвать доступ|Відкликати доступ|Révoquer l’accès",
+  members:"Organizers|Organizadores|Organizadores|Организаторы|Організатори|Organisateurs",
+  none:"No organizers yet.|Ainda não há organizadores.|Aún no hay organizadores.|Организаторов пока нет.|Організаторів поки немає.|Aucun organisateur.",
+  scope:"Access to the selected contest|Acesso ao concurso selecionado|Acceso al concurso seleccionado|Доступ к выбранному конкурсу|Доступ до обраного конкурсу|Accès au concours sélectionné",
+  choose:"Select a contest in the catalogue to assign organizers.|Selecione um concurso no catálogo para atribuir organizadores.|Selecciona un concurso del catálogo para asignar organizadores.|Выбери конкурс в каталоге, чтобы назначить организаторов.|Обери конкурс у каталозі, щоб призначити організаторів.|Sélectionnez un concours du catalogue pour attribuer des organisateurs.",
+  assigned:"Assigned contests|Concursos atribuídos|Concursos asignados|Назначенные конкурсы|Призначені конкурси|Concours attribués",
+  log:"Access history|Histórico de acessos|Historial de accesos|История выдачи прав|Історія надання прав|Historique des droits",
+  saved:"Access updated.|Acesso atualizado.|Acceso actualizado.|Права обновлены.|Права оновлено.|Droits mis à jour.",
+  profile_not_found:"No profile found. Ask the person to sign in and set a nickname.|Perfil não encontrado. Peça à pessoa para iniciar sessão e definir uma alcunha.|Perfil no encontrado. Pide que inicie sesión y configure un alias.|Профиль не найден. Попроси человека войти и установить никнейм.|Профіль не знайдено. Попроси людину увійти та встановити нікнейм.|Profil introuvable. Demandez à la personne de se connecter et de choisir un pseudo.",
+  owner_protected:"The owner's access cannot be changed here.|O acesso do proprietário não pode ser alterado aqui.|El acceso del propietario no se puede cambiar aquí.|Доступ владельца здесь изменить нельзя.|Доступ власника тут змінити неможливо.|L’accès du propriétaire ne peut pas être modifié ici.",
+  forbidden:"Access is unavailable or has been revoked.|Acesso indisponível ou revogado.|Acceso no disponible o revocado.|Доступ отсутствует или отозван.|Доступ відсутній або відкликаний.|Accès indisponible ou révoqué.",
+  error:"Could not update access. Refresh and try again.|Não foi possível atualizar. Atualize e tente novamente.|No se pudo actualizar. Actualiza e inténtalo de nuevo.|Не удалось обновить права. Обнови страницу и повтори.|Не вдалося оновити права. Онови сторінку та повтори.|Impossible de mettre à jour. Actualisez et réessayez.",
+  organizer_granted:"Organizer access granted or updated|Acesso de organizador concedido ou atualizado|Acceso de organizador concedido o actualizado|Доступ организатора выдан или обновлён|Доступ організатора надано або оновлено|Accès organisateur accordé ou modifié",
+  organizer_create_enabled:"Contest creation enabled|Criação de concursos permitida|Creación de concursos permitida|Разрешено создание конкурсов|Дозволено створення конкурсів|Création de concours autorisée",
+  organizer_revoked:"Organizer access revoked|Acesso de organizador revogado|Acceso de organizador revocado|Доступ организатора отозван|Доступ організатора відкликано|Accès organisateur révoqué",
+  round_assigned:"Contest assigned|Concurso atribuído|Concurso asignado|Конкурс назначен|Конкурс призначено|Concours attribué",
+  round_unassigned:"Contest access removed|Acesso ao concurso removido|Acceso al concurso retirado|Доступ к конкурсу снят|Доступ до конкурсу знято|Accès au concours retiré",
+  round_created:"Organizer created a contest|Organizador criou concurso|Organizador creó concurso|Организатор создал конкурс|Організатор створив конкурс|Concours créé par l’organisateur",
+  noAssignments:"No contests assigned yet. Ask the owner for access.|Ainda sem concursos atribuídos. Peça acesso ao proprietário.|Sin concursos asignados. Pide acceso al propietario.|Конкурсы ещё не назначены. Обратись к владельцу за доступом.|Конкурси ще не призначено. Звернись до власника по доступ.|Aucun concours attribué. Demandez un accès au propriétaire.",
+  approve:"Approve entry|Aprovar projeto|Aprobar proyecto|Одобрить работу|Схвалити роботу|Approuver le projet",
+  reject:"Reject entry|Rejeitar projeto|Rechazar proyecto|Отклонить работу|Відхилити роботу|Refuser le projet",
+  reason:"Moderation reason (required for rejection)|Motivo (obrigatório para rejeitar)|Motivo (obligatorio para rechazar)|Причина модерации (обязательна при отказе)|Причина модерації (обов’язкова при відмові)|Motif (obligatoire en cas de refus)",
+  moderate:"Apply decision|Aplicar decisão|Aplicar decisión|Применить решение|Застосувати рішення|Appliquer la décision",
+  moderation:"Moderation|Moderação|Moderación|Модерация|Модерація|Modération",
+} as const;
+export type AccessText=keyof typeof copy;
+export function accessText(locale:Locale,key:AccessText) { return copy[key].split("|")[languages.indexOf(locale)]; }

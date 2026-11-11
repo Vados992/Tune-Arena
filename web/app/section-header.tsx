@@ -26,14 +26,16 @@ export default function SectionHeader({locale,change,area}:{
   return <>
     <header className="header">
       <a href="/" className="brand"><span className="mark" aria-hidden="true">T</span><span>TUNE<span className="brand-accent">ARENA</span></span></a>
+      <a className="outline" href="/">Главное меню</a>
       <select aria-label={t("language")} value={locale} onChange={e=>change(e.target.value as Locale)}>
         {languages.map(l=><option value={l} key={l}>{labels[l]}</option>)}
       </select>
     </header>
-    <nav className="tabs section-nav" aria-label="Tune Arena">
+    {area!=="winners"&&<nav className="tabs section-nav" aria-label="Tune Arena">
       <a href="/">{t("viewContest")}</a>
-      <a href="/winners" aria-current={area==="winners"?"page":undefined}>{t("winners")}</a>
+      <a href="/trophies">Трофеи</a>
+      <a href="/winners">{t("winners")}</a>
       {area==="admin"&&<a className="admin-link" href="/admin" aria-current="page">{t("admin")}</a>}
-    </nav>
+    </nav>}
   </>;
 }

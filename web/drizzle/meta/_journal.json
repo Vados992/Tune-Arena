@@ -36,6 +36,62 @@
       "when": 1794055857507,
       "tag": "0004_burly_senator_kelly",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1794148200000,
+      "tag": "0005_charged_garage",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1794150000000,
+      "tag": "0006_build_replacement",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1794160000000,
+      "tag": "0007_commerce",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1794231845392,
+      "tag": "0008_dear_jimmy_woo",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "6",
+      "when": 1794232365708,
+      "tag": "0009_blushing_junta",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1794248262221,
+      "tag": "0010_fearless_epoch",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1794323741176,
+      "tag": "0011_pretty_lifeguard",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1794402227070,
+      "tag": "0012_worthless_morlocks",
+      "breakpoints": true
     }
   ]
 }

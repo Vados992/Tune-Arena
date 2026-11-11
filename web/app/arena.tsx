@@ -4,25 +4,30 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from "react"
 import { languages, language, type Locale } from "@/lib/locale";
 import { translate, type Text } from "@/lib/strings";
 import { api, errorLabel } from "@/lib/client";
-import { frames, frameTitles, sampleGarage, workshop } from "@/lib/garage";
+import { frames, frameTitles } from "@/lib/garage";
 import ClubPanel, { ClubReward } from "./club-panel";
 import type { Club } from "@/lib/referrals";
 import { socialText } from "@/lib/social-strings";
-import PhotoPicker from "./photo-picker";
-import { Home, Flame, Trophy, UserRound, Users, Search, Plus, Heart, ThumbsDown, Send, ArrowUpRight, Timer, ShieldCheck, Camera, Crown, Flag, ChevronRight, X, SquarePlus } from "lucide-react";
+import { accessText } from "@/lib/access-strings";
+import TourList from "./tour-list";
+import RaceTrackIcon from "@/components/race-track-icon";
+import TurboIcon from "@/components/turbo-icon";
+import { Home, Trophy, UserRound, Users, Search, Plus, Heart, Send, ArrowUpRight, Timer, ShieldCheck, Camera, Crown, LockKeyhole, Check, X, SquarePlus } from "lucide-react";
 
 type Credit={author:string;source:string;license:string;terms?:string};
-type Entry={id:string;name:string;description:string;image:string;likes:number;liked:boolean;dislikes:number;disliked:boolean;mine:boolean;sample:boolean;frame:string;gift:number;nickname:string|null;created:number;credit?:Credit};
-type Profile={nickname:string|null;premium:boolean;premiumUntil:number;trialUsed:boolean;frame:string;gift:boolean};
-type Round={id:string;kind:string;closes:number;serverTime:number;closed:boolean;title:string;notice:string;prize:string;announced:number};
-type Model={signedIn:boolean;admin?:boolean;providers:{email:boolean;telegram:boolean;chatgpt?:boolean;local?:boolean};round?:Round;
+type Entry={avatar?:string|null;id:string;name:string;description:string;image:string;likes:number;liked:boolean;mine:boolean;sample:boolean;frame:string;gift:number;nickname:string|null;created:number;premium:boolean;motors:number;score:number;entryOrder:number;credit?:Credit};
+type Profile={avatar?:string|null;championTitles?:number;nickname:string|null;premium:boolean;premiumUntil:number;trialUsed:boolean;frame:string;gift:boolean};
+type Round={id:string;kind:string;opens?:number;submissionsClose:number;submissionsClosed:boolean;closes:number;serverTime:number;closed:boolean;title:string;notice:string;prize:string;announced:number};
+type OwnEntry={id:string;name:string;description:string;withdrawn:number;image?:string;likes?:number;score?:number;rank?:number|null;moderation_state?:string;moderation_reason?:string};
+type PremiumProduct={id:string;name:string;kind:string;amount:number;currency:string;duration:number;stock:number};
+type GarageTrophy={code:string;category:string;title:string;name:string;issued:number;revoked:number};
+type Model={nextRound?:{id:string;title:string;opens:number;prize?:string}|null;myEntry?:OwnEntry|null;overallWinner?:Entry|null;motor?:{enabled:boolean;available:boolean;spentEntry:string|null};signedIn:boolean;admin?:boolean;role?:"owner"|"organizer"|"participant";providers:{telegram:boolean};round?:Round;
   winner?:{id:string;name:string;likes:number;nickname:string|null}|null;entries?:Entry[];profile?:Profile;club?:Club|null};
 type Section="feed"|"top"|"profile";
-type Modal="rules"|"entry"|"login"|"nickname";
+type Modal="frames"|"premium"|"rules"|"withdraw"|"login"|"nickname"|"deleteAccount";
 const labels={en:"English",pt:"Português",es:"Español",ru:"Русский",uk:"Українська",fr:"Français"};
-const navIcons={feed:Home,top:Flame,profile:UserRound};
-const empty:Model={signedIn:false,providers:{email:false,telegram:false}};
-const photoCredits=[...Object.values(sampleGarage),...workshop];
+const navIcons={feed:Home,top:RaceTrackIcon,profile:UserRound};
+const empty:Model={signedIn:false,providers:{telegram:false}};
 const fmt=(seconds:number)=>[Math.floor(seconds/86400),Math.floor(seconds/3600)%24,Math.floor(seconds/60)%60,seconds%60].map(x=>String(x).padStart(2,"0")).join(":");
 
 export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
@@ -30,8 +35,9 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
   const [tab,setTab]=useState<Section>("feed"),[modal,setModal]=useState<Modal|null>(null);
   const [message,setMessage]=useState<Text|null>(null),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true);
   const [seconds,setSeconds]=useState(0),[confirm,setConfirm]=useState("");
-  const [photo,setPhoto]=useState<File|null>(null),[photoBusy,setPhotoBusy]=useState(false);
-  const [afterNickname,setAfterNickname]=useState<"entry"|null>(null);
+  const [editing,setEditing]=useState<OwnEntry|null>(null);
+  const accountRemoved=useRef(false);
+  const [deletionConfirmed,setDeletionConfirmed]=useState(false);
   const roundId=useRef(""),nicknamePrompted=useRef(false);
   const referral=useRef("");
   const [returnTo,setReturnTo]=useState("/");
@@ -39,9 +45,32 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
   const sequence=useRef(0);
   const t=(key:Text)=>translate(locale,key);
   const st=socialText(locale);
-  const [search,setSearch]=useState(""),[onlyMine,setOnlyMine]=useState(false),[sort,setSort]=useState("new");
+  const [search,setSearch]=useState("");
+  const [garage,setGarage]=useState<{products:PremiumProduct[];trophies:GarageTrophy[];ready:boolean;priceError:boolean;trophyError:boolean}>({products:[],trophies:[],ready:false,priceError:false,trophyError:false});
+  const [garageRefresh,setGarageRefresh]=useState(0);
+  const garageActive=tab==="profile"||modal==="frames"||modal==="premium";
+  const modalOpen=!!modal;
+  useEffect(()=>{
+    if(!modalOpen)return;
+    const trigger=document.activeElement as HTMLElement|null,overflow=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    return()=>{document.body.style.overflow=overflow;if(trigger?.isConnected)trigger.focus();};
+  },[modalOpen]);
+  useEffect(()=>{if(modal)document.querySelector<HTMLElement>(".dialog .dismiss")?.focus();},[modal]);
+  useEffect(()=>{
+    if(!garageActive)return;
+    let alive=true;
+    const catalog=api<{products:PremiumProduct[]}>("commerce/catalog");
+    const trophies=data.signedIn?api<{trophies:GarageTrophy[]}>("trophies"):Promise.resolve({trophies:[]});
+    void Promise.allSettled([catalog,trophies]).then(([prices,awards])=>{
+      if(!alive)return;
+      setGarage({products:prices.status==="fulfilled"?prices.value.products:[],trophies:awards.status==="fulfilled"?awards.value.trophies.filter(t=>!t.revoked):[],ready:true,priceError:prices.status==="rejected",trophyError:awards.status==="rejected"});
+    });
+    return()=>{alive=false;};
+  },[garageActive,data.signedIn,garageRefresh]);
 
   const load=useCallback(async ()=>{
+    if(accountRemoved.current)return;
     const seq=++sequence.current;
     const query=new URLSearchParams();
     if (roundId.current) query.set("round",roundId.current);
@@ -49,6 +78,7 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
     const next=await api<Model>("state"+(query.size?"?"+query.toString():""));
     if (seq!==sequence.current) return;
     setData(next);
+    if(next.signedIn){try{localStorage.setItem("ta_known_account","1");}catch{/* Device memory is optional. */}}
     if (next.round) {
       epoch.current={seconds:next.round.serverTime,clock:Date.now(),closes:next.round.closes};
       setSeconds(Math.max(0,next.round.closes-next.round.serverTime));
@@ -61,7 +91,8 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
     roundId.current=query.get("round")??"";
     referral.current=query.get("ref")??"";
     setReturnTo(location.pathname+location.search);
-    if (query.has("club")) setTab("profile");
+    if (query.has("club")||query.has("garage")) setTab("profile");
+    if(query.has("tour"))setTab("top");
     setConfirm(query.get("confirm")??"");
     if (query.has("auth")) setMessage("error");
     load().catch(()=>setMessage("error")).finally(()=>setLoading(false));
@@ -69,7 +100,6 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
     return ()=>clearInterval(poll);
   },[load]);
   useEffect(()=>{document.documentElement.lang=locale;},[locale]);
-  useEffect(()=>{if(modal!=="entry"){setPhoto(null);setPhotoBusy(false);}},[modal]);
   useEffect(()=>{
     if(data.signedIn && !data.profile?.nickname && !confirm && !nicknamePrompted.current) {
       nicknamePrompted.current=true;
@@ -96,7 +126,7 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
     try {await work();}
     catch(error) {
       setMessage(errorLabel(error));
-      if (error instanceof Error && error.message==="closed") await load().catch(()=>{});
+      if (error instanceof Error && ["closed","submissions_closed","entry_replaced","not_found","premium_required"].includes(error.message)) await load().catch(()=>{});
     }
     finally{setBusy(false);}
   }
@@ -112,37 +142,30 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
       changeRound(result.id);await load();
     });
   }
-  function nickname(next:"entry"|null=null) {setAfterNickname(next);setModal("nickname");setMessage(null);}
-  function enter(){
-    setMessage(null);
-    if (!data.signedIn) setModal("login");
-    else if (!data.profile?.nickname) nickname("entry");
-    else setModal("entry");
-  }
-  function vote(entry:Entry,negative=false) {
+  function nickname() {setModal("nickname");setMessage(null);}
+  function vote(entry:Entry) {
     if(!data.signedIn){setModal("login");return;}
     if(!data.round || data.round.closed || entry.mine) return;
     void run(async()=>{
-      await api("rounds/"+data.round!.id+(negative?"/dislikes/":"/votes/")+entry.id,(negative?entry.disliked:entry.liked)?"DELETE":"PUT");
+      await api("rounds/"+data.round!.id+"/votes/"+entry.id,entry.liked?"DELETE":"PUT");
       await load();
     });
   }
-  function submit(event:FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if(!data.round)return;
-    if(!photo||photoBusy){setMessage("imageError");return;}
-    const form=new FormData(event.currentTarget);
-    form.set("photo",photo);
-    void run(async()=>{
-      await api("rounds/"+data.round!.id+"/entries","POST",form);await load();setModal(null);setMessage("published");
-    });
+  function motor(entry:Entry) {
+    if(!data.signedIn){setModal("login");return;}
+    if(!data.profile?.premium){setModal("premium");return;}
+    if(!data.round||closed||entry.mine||!data.motor?.available)return;
+    void run(async()=>{await api("rounds/"+data.round!.id+"/motors/"+entry.id,"PUT");await load();});
+  }
+  function withdraw(){
+    if(!round||!editing)return;
+    void run(async()=>{await api('rounds/'+round.id+'/entries/'+editing.id,'DELETE');await load();setModal(null);setMessage('buildWithdrawn');});
   }
   function saveNickname(event:FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const value=new FormData(event.currentTarget).get("nickname");
     void run(async()=>{
-      await api("profile/nickname","PUT",{nickname:value});await load();setModal(afterNickname);setAfterNickname(null);
-      if (!afterNickname) setMessage("nicknameSaved");
+      await api("profile/nickname","PUT",{nickname:value});await load();setModal(null);setMessage("nicknameSaved");
     });
   }
   function share() {
@@ -151,178 +174,153 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
     if(navigator.share) void navigator.share({title:"TUNE ARENA",url}).catch(()=>{});
     else void navigator.clipboard.writeText(url).then(()=>setMessage("copied")).catch(()=>setMessage("error"));
   }
-  function closeModal(){setModal(null);setMessage(null);setAfterNickname(null);}
+  function deleteOwnAccount(event:FormEvent<HTMLFormElement>){
+    event.preventDefault();if(!deletionConfirmed||!data.signedIn||busy)return;
+    void run(async()=>{
+      const result=await api<{ok:boolean}>("account","DELETE",{confirmation:"DELETE"});
+      if(result.ok!==true)throw new Error("server_error");
+      accountRemoved.current=true;sequence.current++;setData(empty);setModal(null);
+      try{localStorage.removeItem("ta_known_account");}catch{}
+      location.replace("/?deleted=1");
+    });
+  }
+  function closeModal(){if(modal==="deleteAccount"&&busy)return;setModal(modal==="premium"?"frames":null);setMessage(null);}
 
   const round=data.round,closed=!!round?.closed,profile=data.profile;
+  const submissionsClosed=closed||!!round&&(round.submissionsClosed||round.closes-seconds>=round.submissionsClose);
+  const entryDate=(epoch:number)=>new Intl.DateTimeFormat(locale,{timeZone:'Europe/Lisbon',dateStyle:'medium',timeStyle:'short'}).format(epoch*1000);
   const sections:Section[]=["feed","top","profile"];
-  const filtered=[...(data.entries??[])].filter(e=>(!onlyMine||e.mine)&&
+  const participantEntries=(data.entries??[]).filter(e=>!e.sample);
+  const filtered=[...participantEntries].filter(e=>
     (!search.trim()||[e.name,e.description,e.nickname??""].join(" ").toLocaleLowerCase().includes(search.trim().toLocaleLowerCase())))
-    .sort((a,b)=>sort==="popular"?b.likes-a.likes:b.created-a.created);
-  const samples=Object.values(sampleGarage).filter(e=>!search.trim()||e.title.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()));
-  function navigate(next:Section) {setTab(next);setMessage(null);setSearch("");setOnlyMine(false);window.scrollTo({top:0,behavior:"instant"});}
-  const action=()=>round?enter():startTest();
-  const totalVotes=(data.entries??[]).reduce((n,e)=>n+e.likes,0);
+    .sort((a,b)=>b.created-a.created);
+  function navigate(next:Section) {setTab(next);setMessage(null);setSearch("");window.scrollTo({top:0,behavior:"instant"});}
+  const entryUploadHref="/upload/entry"+(round?"?round="+encodeURIComponent(round.id):"");
+  const roundTitle=round?.kind==="test"?(round.title||t("test")):round?.title&&round.title!=="Недельный раунд"?round.title:t("nightNeon");
+  const myCar=data.myEntry&&!data.myEntry.withdrawn?data.myEntry:null;
+  const ownVisible=myCar?participantEntries.find(e=>e.id===myCar.id):undefined;
+  const myCarImage=myCar?.image??ownVisible?.image;
+  const fallbackRank=myCar?[...participantEntries].sort((a,b)=>b.score-a.score||a.created-b.created||a.entryOrder-b.entryOrder).findIndex(e=>e.id===myCar.id):-1;
+  const myCarRank=myCar?.rank??(fallbackRank<0?null:fallbackRank+1);
+  const premiumOffer=garage.products.find(p=>p.kind==="premium"&&p.stock!==0&&p.amount>0);
+  const premiumHref="/shop?premium=1"+(premiumOffer?"&product="+encodeURIComponent(premiumOffer.id):"");
+  function premiumCard(){
+    return <section className="panel garage-premium-card" data-garage-section="premium">
+      <div className="garage-premium-main"><div><h2><Crown size={18}/>Premium</h2><p className="garage-premium-price">{!garage.ready?t("garageLoading"):premiumOffer?new Intl.NumberFormat(locale,{style:"currency",currency:premiumOffer.currency}).format(premiumOffer.amount/100):t(garage.priceError?"garagePriceError":"garagePricePending")}{premiumOffer&&premiumOffer.duration>0&&<small> / {new Intl.NumberFormat(locale,{maximumFractionDigits:1}).format(premiumOffer.duration/86400)} {t("garageDays")}</small>}</p>
+        {!!profile?.premiumUntil&&<p className="garage-premium-expiry">{t(profile.premium?"garageUntil":"garageExpired")} <time dateTime={new Date(profile.premiumUntil*1000).toISOString()}>{new Intl.DateTimeFormat(locale,{day:"numeric",month:"long",timeZone:"Europe/Lisbon"}).format(profile.premiumUntil*1000)}</time></p>}</div>
+        <a className="primary" href={premiumHref}>{t(profile?.premiumUntil?"garageRenew":"garageBuy")}</a></div>
+      {garage.priceError&&<button className="text-button" type="button" onClick={()=>setGarageRefresh(n=>n+1)}>{t("refresh")}</button>}
+    </section>;
+  }
+  function chooseFrame(frame:typeof frames[number]){
+    if(frame!=="plain"&&!profile?.premium){setModal("premium");setMessage(null);return;}
+    if(!data.signedIn)return;
+    void run(async()=>{
+      if(frame==="flame"&&!profile?.gift)await api("gift","POST");
+      await api("profile/frame","PUT",{frame});await load();
+    });
+  }
   return <div className="shell social-shell">
     <header className="header social-header">
       <a href="/" className="brand"><span className="mark" aria-hidden="true">T</span><span>TUNE<span className="brand-accent">ARENA</span></span></a>
       <label className="social-search"><Search size={18}/><input type="search" aria-label={st.search} placeholder={st.search} value={search} onChange={e=>{setSearch(e.target.value);setTab("feed");}}/></label>
-      <div className="header-actions"><select aria-label={t("language")} value={locale} onChange={e=>changeLocale(e.target.value)}>{languages.map(l=><option value={l} key={l}>{labels[l]}</option>)}</select>
+      <div className="header-actions"><a className="menu-home" href="/">Главное меню</a><select aria-label={t("language")} value={locale} onChange={e=>changeLocale(e.target.value)}>{languages.map(l=><option value={l} key={l}>{labels[l]}</option>)}</select>
         <a className="install-header-link" href="/install" aria-label={t("install")} title={t("install")}><SquarePlus size={19}/></a>
-        <button className={"avatar header-user "+(profile?.frame??"plain")} onClick={()=>navigate("profile")} aria-label={t("profile")}>{profile?.nickname?.slice(0,1).toUpperCase()??<UserRound size={19}/>}</button></div>
+        <button className={"avatar header-user "+(profile?.frame??"plain")} onClick={()=>{navigate("profile");setModal("frames");}} aria-label={t("garageAppearance")}>{profile?.avatar?<img src={profile.avatar} alt=""/>:profile?.nickname?.slice(0,1).toUpperCase()??<UserRound size={19}/>}</button></div>
     </header>
     <div className="social-layout">
     <aside className="social-rail"><div className="rail-inner">
       <p className="rail-label">{st.culture}</p>
-      <nav aria-label="Tune Arena">{sections.map(n=>{const Icon=navIcons[n];return <button type="button" key={n} aria-current={tab===n?"page":undefined} onClick={()=>navigate(n)}><Icon size={22}/>{n==="feed"?st.feed:t(n)}{tab===n&&<span className="nav-dot"/>}</button>;})}
-        <a href="/winners"><Trophy size={22}/>{t("winners")}</a>
+      <nav aria-label="Tune Arena"><a href="/">← Главное меню</a>{sections.map(n=>{const Icon=navIcons[n];return <button type="button" key={n} aria-current={tab===n?"page":undefined} onClick={()=>navigate(n)}><Icon size={22}/>{n==="feed"?st.feed:t(n)}{tab===n&&<span className="nav-dot"/>}</button>;})}
+        <a href="/trophies">Мои трофеи</a><a href="/winners"><Trophy size={22}/>{t("winners")}</a>
         <a href="/install"><SquarePlus size={22}/>{t("install")}</a>
         <button type="button" onClick={()=>navigate("profile")}><Users size={22}/>{st.club}</button>
-        {data.admin&&<a href="/admin"><ShieldCheck size={22}/>{t("admin")}</a>}
+        {data.role==="owner"&&<a href="/business">Коммерческий кабинет</a>}
+        {data.admin&&<a href="/admin"><ShieldCheck size={22}/>{data.role==="organizer"?accessText(locale,"assigned"):t("admin")}</a>}
       </nav>
-      <button className="primary rail-publish" disabled={busy||closed} onClick={action}><Plus size={20}/>{t("enter")}</button>
-      <div className="rail-club"><Crown size={23}/><strong>TURBO CLUB</strong><p>{st.clubOffer}</p><button type="button" onClick={()=>navigate("profile")}>{st.clubOpen}<ArrowUpRight size={17}/></button></div>
-      <button type="button" className="rail-account" onClick={()=>data.signedIn?navigate("profile"):setModal("login")}><span className={"avatar "+(profile?.frame??"plain")}>{profile?.nickname?.slice(0,1).toUpperCase()??"T"}</span><span><strong>{profile?.nickname?"@"+profile.nickname:t("login")}</strong><small>{profile?.premium?t("active"):st.pilot}</small></span></button>
+      <a className="primary rail-publish" href={entryUploadHref} target="_top"><Plus size={20}/>{t("enter")}</a>
+      <button type="button" className="rail-account" onClick={()=>data.signedIn?navigate("profile"):setModal("login")}><span className={"avatar "+(profile?.frame??"plain")}>{profile?.avatar?<img src={profile.avatar} alt=""/>:profile?.nickname?.slice(0,1).toUpperCase()??"T"}</span><span><strong>{profile?.nickname?"@"+profile.nickname:t("login")}</strong><small>{profile?.premium?t("active"):st.pilot}</small></span></button>
     </div></aside>
-    <main className="social-main">
-      <div className="feed-heading"><div><p className="eyebrow">TUNE ARENA / COMMUNITY</p><h1>{tab==="feed"?st.feed:t(tab)}</h1></div><span className="pilot"><span/>{t("pilot")}</span></div>
-      {tab==="feed"&&<>
-      <section className="hero">
-        <img className="hero-car" src="/garage/86.webp" alt="Toyota 86 Custom" fetchPriority="high"/>
-        <div className="hero-copy"><p className="eyebrow">{t("garageTag")} <span> / </span> {t("kicker")}</p><h2>{t("line1")}<br/><em>{t("line2")}</em></h2><p>{t("intro")}</p>
-          <div className="actions">{round ? !closed&&<button className="primary" onClick={enter}>+ {t("enter")}</button> : <button className="primary" disabled={busy} onClick={startTest}>{t("oneMinute")}</button>}
-            <button className="outline" onClick={()=>setModal("rules")}>{t("rules")}</button></div>
-        </div>
-        <div className="hero-index" aria-hidden="true">TA<span> / </span>86</div>
-      </section>
-      </>}
-      {tab==="feed"&&<div className="strip">
-        <section className="timing"><span className="mini">{round?.title||t(round?.kind==="weekly"?"weekly":"test")}</span>
-          <strong>{round ? closed?t("finished"):fmt(seconds) : "01:00"}</strong><small>{round ? closed?"":t("time") : t("challenge")}</small>
-        </section>
-        <section className="prize"><span className="mini">{t(round?.prize?"ownerPrize":"prize")}</span>
-          <strong>{round?.prize||<>100 <b>USDT</b></>}</strong>{!round?.prize&&<small>{t("usdt")}</small>}</section>
-      </div>}
-      {round?.notice&&<p className="notice announcement"><span className="eyebrow">{t("roundNotice")}</span>{round.notice}</p>}
-      {confirm && <aside className="notice"><button className="primary" disabled={busy} onClick={()=>void run(async()=>{await api("auth/email/verify","POST",{proof:confirm});location.replace("/");})}>{t("confirm")}</button></aside>}
-      {message && !modal && <p className="notice" role="status">{t(message)}{message==="error" && <button className="outline" onClick={()=>void run(load)}>{t("again")}</button>}</p>}
-      {tab==="feed"&&<>
-        <section className="social-composer"><span className={"avatar "+(profile?.frame??"plain")}>{profile?.nickname?.slice(0,1).toUpperCase()??"T"}</span>
-          <button type="button" className="composer-prompt" onClick={action} disabled={closed}>{st.composer}</button><button className="composer-photo" type="button" disabled={closed||busy} onClick={action} aria-label={st.addPhoto}><Camera size={22}/></button>
-        </section>
-        <nav className="feed-filters" aria-label={st.feed}><button type="button" aria-pressed={!onlyMine} onClick={()=>setOnlyMine(false)}>{st.all}</button><button type="button" aria-pressed={onlyMine} onClick={()=>setOnlyMine(true)}>{st.mine}</button>
-          <select aria-label={st.sort} value={sort} onChange={e=>setSort(e.target.value)}><option value="new">{st.new}</option><option value="popular">{st.popular}</option></select></nav>
-        {search&&<p className="search-summary">“{search}”<button aria-label={t("close")} onClick={()=>setSearch("")}><X size={16}/></button></p>}
-      </>}
-      {loading && <p className="notice">{t("load")}</p>}
-      {!loading && tab==="feed" && !round && <section className="works">
-        <div className="section-title"><h2>{st.explore}</h2><span className="state">{t("sampleOnly")}</span></div>
-        {(onlyMine||samples.length===0)&&<div className="feed-empty"><Search size={25}/><p>{st.noMatches}</p><button className="outline" onClick={()=>{setSearch("");setOnlyMine(false);}}>{st.reset}</button></div>}
-        <div className="grid gallery">{(!onlyMine?samples:[]).map(e=><article key={e.image} className="card social-post">
-          <div className="post-header"><span className="post-photo-avatar"><img src={e.image} alt=""/></span><div><strong>{e.title}</strong><small>TUNE ARENA · {t("sampleOnly")}</small></div><span className="post-category">SHOWCASE</span></div>
-          <div className="card-image"><img src={e.image} alt={e.title} loading="lazy"/></div>
-          <div className="card-body"><p>{t("sampleText")}</p><a className="photo-credit" href={e.source} target="_blank" rel="noreferrer">{e.author} · {e.license}</a>
-          <button type="button" className="sample-try" onClick={startTest}><Flag size={17}/>{t("oneMinute")}<ArrowUpRight size={17}/></button></div>
-        </article>)}</div>
+    <main className={"social-main"+(tab==="feed"?" participant-feed-main":"")}>
+      {tab==="feed"?<h1 className="sr-only">{st.feed}</h1>:<div className="feed-heading"><div><p className="eyebrow">TUNE ARENA / COMMUNITY</p><h1>{t(tab)}</h1></div><span className="pilot"><span/>{t("pilot")}</span></div>}
+      {tab==="top"&&<section className="tour-banner" aria-label={t("roundBanner")}>
+        <div className="tour-banner-heading"><span className="eyebrow">{t("top")}</span><button type="button" className="tour-rules" onClick={()=>setModal("rules")}>{t("rules")}</button></div>
+        <h2>{round?roundTitle:t("nothing")}</h2>
+        <p className="tour-status">{round?t(closed?"tourEnded":round.opens&&round.opens>round.serverTime?"tourScheduled":"tourCurrent"):t("nothing")}</p>
+        {round&&<p>{t("tourStarts")}: {entryDate(round.opens??round.serverTime)} · {t("tourEnds")}: {entryDate(round.closes)}</p>}
+        <div className="tour-banner-meta"><span className="tour-prize"><Trophy size={17}/>{round?.prize||t("winnerPrizePending")}</span><span className="tour-countdown"><Timer size={17}/><strong>{round?(closed?t("finished"):fmt(seconds)):"—"}</strong></span></div>
+        {round&&<button type="button" className="outline tour-share" onClick={share}><Send size={17}/>{t("tourShare")}</button>}
       </section>}
-      {round && tab==="feed" && <section className="works">
-        <div className="section-title"><h2>{t("feed")}</h2><span className={"state "+(closed?"":"live")}>{t(closed?"finished":"open")}</span></div>
-        {closed && <div className="winner" role="status">{data.winner?<><span>{t(round.announced?"publishedWinner":"winner")}</span><strong>{data.winner.name}</strong>
-          <small>{data.winner.nickname?"@"+data.winner.nickname+" · ":""}{data.winner.likes} · {t("votes")}</small></>:<strong>{t("none")}</strong>}
-          <a className="winner-link" href="/winners">{t("winners")}</a></div>}
-        {filtered.length===0&&<div className="feed-empty"><Search size={25}/><p>{search||onlyMine?st.noMatches:t("nothing")}</p>{(search||onlyMine)&&<button className="outline" onClick={()=>{setSearch("");setOnlyMine(false);}}>{st.reset}</button>}</div>}
-        <div className="grid">{filtered.map((e,i)=><article key={e.id} className="card social-post">
-          <div className="post-header"><span className={"avatar "+e.frame}>{(e.nickname||e.name).slice(0,1).toUpperCase()}</span><div><strong>{e.nickname?"@"+e.nickname:e.name}{e.gift>0&&<Crown size={13}/>}</strong><small>{e.sample?t("sampleOnly"):new Intl.DateTimeFormat(locale,{day:"numeric",month:"short"}).format(new Date(e.created*1000))} · {round.title||t(round.kind==="weekly"?"weekly":"test")}</small></div><span className="post-category">{e.mine?t("mine"):"BUILD"}</span></div>
-          <div className="card-image"><img src={e.image} alt={e.name} loading={i===0?"eager":"lazy"}/><span>{e.mine?t("mine"):e.sample?t("sampleOnly"):String(i+1).padStart(2,"0")}</span></div>
+      {tab==="top"&&<><section className="panel next-tour" aria-label={t("tourNext")}><span className="eyebrow">{t("tourNext")}</span>{data.nextRound?<><h2>{data.nextRound.title||t("nightNeon")}</h2><p>{t("tourStarts")}: <time dateTime={new Date(data.nextRound.opens*1000).toISOString()}>{entryDate(data.nextRound.opens)}</time> · {t("winnerPrize")}: <strong>{data.nextRound.prize||t("winnerPrizePending")}</strong></p></>:<p>{loading?t("load"):t("tourUnscheduled")}</p>}</section><TourList locale={locale}/></>}
+      {loading && tab==="feed" && <p className="notice" role="status">{t("load")}</p>}
+      {!loading && tab==="feed" && <section className="works participant-feed" aria-label={st.feed}>
+        {filtered.length===0&&<div className="feed-empty"><p>{search?st.noMatches:t("noParticipantPhotos")}</p>{search&&<button className="outline" onClick={()=>setSearch("")}>{st.reset}</button>}</div>}
+        <div className="grid">{filtered.map((e,i)=><article key={e.id} className={"card social-post "+(e.premium?"premium-post frame-"+e.frame:"")}>
+          <div className="card-image"><img src={e.image} alt={e.name} loading={i===0?"eager":"lazy"} fetchPriority={i===0?"high":"auto"}/><span>{e.mine?t("mine"):String(i+1).padStart(2,"0")}</span></div>
+          <div className="post-header"><span className={"avatar "+e.frame}>{e.avatar?<img src={e.avatar} alt=""/>:(e.nickname||e.name).slice(0,1).toUpperCase()}</span><div><strong className={e.premium?"premium-name":""}>{e.nickname?"@"+e.nickname:e.name}{!!e.premium&&<Crown size={13} aria-label={t("chargedGarage")}/>}</strong><small>{new Intl.DateTimeFormat(locale,{day:"numeric",month:"short"}).format(new Date(e.created*1000))} · {roundTitle}</small></div><span className="post-category">{e.mine?t("mine"):"BUILD"}</span></div>
           <div className="card-body"><h3>{e.name}</h3>
-          <p>{e.sample?t("sampleText"):e.description}</p>
+          <p>{e.description}</p>
           {e.credit&&<a className="photo-credit" href={e.credit.source} target="_blank" rel="noreferrer">{e.credit.author} · {e.credit.license}</a>}
           <div className="card-actions">
             <button className="like" type="button" aria-label={t("vote")} aria-pressed={e.liked} disabled={busy||closed||e.mine} onClick={()=>vote(e)}><Heart size={21} fill={e.liked?"currentColor":"none"}/> <strong>{e.likes}</strong> <small>{t(e.liked?"voted":"vote")}</small></button>
-            <button className="dislike" type="button" aria-label={t("dislikeAction")} aria-pressed={e.disliked} disabled={busy||closed||e.mine} onClick={()=>vote(e,true)}><ThumbsDown size={20} fill={e.disliked?"currentColor":"none"}/><strong>{e.dislikes}</strong></button>
+            {data.motor?.enabled&&<button className="motor-button" type="button" aria-label={t("motor")+" +5"} aria-pressed={data.motor.spentEntry===e.id}
+              disabled={busy||closed||e.mine||!!data.motor.spentEntry} onClick={()=>motor(e)} title={t(data.motor.spentEntry?"motorSpent":"motorRule")}><TurboIcon size={21}/><strong>+5</strong><small>{t("motor")}</small></button>}
             <button className="post-share" type="button" onClick={share} aria-label={t("share")}><Send size={20}/></button>
-          </div></div>
+          </div><small className="score-line">♥ {e.likes} · {t("motor")} {e.motors} × 5 · {t("overall")}: {e.score}</small></div>
         </article>)}</div>
       </section>}
-      {tab==="top" && <section className="panel">
-        <h2>{t("top")}</h2><p>{round?t(closed?(data.winner?"winner":"none"):"pending"):t("nothing")}{closed&&data.winner?" · "+data.winner.name:""}</p>
-        <ol className="rank">{data.entries?.map(e=><li key={e.id}><strong>{e.name}</strong><span>{e.likes} · {t("votes")}</span></li>)}</ol>
-      </section>}
-      {tab==="profile" && <section className="panel premium">
-        <div className="premium-title"><span className={"avatar "+(profile?.premium?profile.frame:"plain")}>{profile?.nickname?.slice(0,1).toUpperCase()??"T"}</span><div><p className="eyebrow">TURBO CLUB</p><h2>{profile?.nickname?"@"+profile.nickname:t("premium")}</h2></div></div>
-        <p>{t("premiumText")}</p><small>{t("cosmetic")}</small>
-        <div className="actions">{profile?.premium ? <><span className="state">{t("active")}</span>{profile.gift?<span>✦ {t("flame")}</span>:<button className="primary" disabled={busy} onClick={()=>void run(async()=>{await api("gift","POST");await load();})}>{t("claim")}</button>}</> :
-          !profile?.trialUsed&&<button className="primary" disabled={busy} onClick={()=>data.signedIn?void run(async()=>{await api("premium","POST");await load();}):setModal("login")}>{t("trialPremium")}</button>}</div>
-        <ClubPanel club={data.club} locale={locale} premiumUntil={profile?.premiumUntil} onLogin={()=>setModal("login")}/>
-        <h3 className="subheading">{t("frames")}</h3>
-        {!profile?.premium&&<p>{t("framesLock")}</p>}
-        <div className="frame-grid">{frames.map(frame=>{
-          const equipped=profile?.premium&&profile.frame===frame,locked=!profile?.premium||(frame==="flame"&&!profile.gift);
-          return <button className="frame-card" type="button" disabled={locked||busy} aria-pressed={!!equipped} key={frame}
-            onClick={()=>void run(async()=>{await api("profile/frame","PUT",{frame});await load();})}>
-            <span className={"avatar "+frame}>{profile?.nickname?.slice(0,1).toUpperCase()??"T"}</span>
-            <strong>{frameTitles[frame]}</strong>{equipped&&<small>{t("equipped")}</small>}
-            {frame==="flame"&&!profile?.gift&&<small>{t("giftLock")}</small>}
-          </button>;
-        })}</div>
-        <div className="actions">{data.signedIn&&<button className="outline" onClick={()=>nickname()}>{t("nickname")}</button>}
-          <button className="outline" onClick={()=>setModal("login")}>{t("login")} · Telegram / Email</button></div>
-      </section>}
-      {tab==="feed"&&<section className="parts" aria-label={t("components")}>
-        <div className="section-title"><div><p className="eyebrow">GARAGE / PARTS</p><h2>{t("components")}</h2></div></div>
-        <div className="parts-grid">{workshop.map(p=><article key={p.image} className="part"><img src={p.image} alt={p.title} loading="lazy"/>
-          <div><h3>{p.title}</h3><a className="photo-credit" href={p.source} target="_blank" rel="noreferrer">{p.author} · {p.license}</a></div></article>)}</div>
-      </section>}
-      <footer className="footer">
-        <div className="actions">{round&&<button className="outline" onClick={share}>{t("share")}</button>}
-          {!loading&&data.signedIn&&<button className="outline" disabled={busy} onClick={startTest}>{t("trial")}</button>}</div>
-        <details className="credits"><summary>{t("photoCredits")}</summary><ul>{photoCredits.map(p=><li key={p.image}>
-          <a href={p.source} target="_blank" rel="noreferrer">{p.title} · {p.author}</a> · {p.terms?<a href={p.terms} target="_blank" rel="noreferrer">{p.license}</a>:p.license} · {t("photoAdapted")}
-        </li>)}</ul></details><p>{t("ownerCredit")}</p>
-      </footer>
+      {message && !modal && <p className="notice" role="status">{t(message)}{message==="error" && <button className="outline" onClick={()=>void run(load)}>{t("again")}</button>}</p>}
+      {tab==="profile"&&<div className="garage-stack">
+        <section className="panel garage-profile" data-garage-section="profile">
+          <div className="garage-avatar-wrap"><button className={"avatar garage-avatar "+(profile?.premium?profile.frame:"plain")} type="button" onClick={()=>setModal("frames")} aria-label={t("garageAppearance")}>{profile?.avatar?<img src={profile.avatar} alt=""/>:profile?.nickname?.slice(0,1).toUpperCase()??<UserRound size={28}/>}</button><a className="garage-avatar-upload" href="/upload/avatar" target="_top" aria-label={t("avatarUpload")}><Camera size={16}/></a></div>
+          <div className="garage-identity"><button className={"garage-nickname "+(profile?.premium?"premium-name":"")} type="button" onClick={()=>data.signedIn?nickname():setModal("login")} aria-label={t("nickname")}>{profile?.nickname?"@"+profile.nickname:t("login")}</button>{profile?.premium&&<span className="garage-premium-badge"><Crown size={13}/>Premium</span>}</div>
+        </section>
+        <section className={"panel garage-car "+(myCar&&profile?.premium?"premium-post frame-"+profile.frame:"")} data-garage-section="car">
+          <h2>{t("garageMyCar")}</h2>
+          {myCar?<>
+            {myCarImage&&<img className="garage-car-photo" src={myCarImage} alt={myCar.name}/>}
+            <h3>{myCar.name}</h3><p className="garage-car-description">{myCar.description}</p>
+            <dl className="garage-car-stats"><div><dt>{t("votes")}</dt><dd><Heart size={16}/>{myCar.likes??ownVisible?.likes??0}</dd></div><div><dt>{t("garageRank")}</dt><dd>{myCarRank?"#"+myCarRank:t("garageUnranked")}</dd></div></dl>
+            {myCar.moderation_state==='pending'&&<p className="garage-muted">{t("garagePending")}</p>}
+            {myCar.moderation_state==='rejected'&&<p className="garage-muted">{t("garageRejected")}{myCar.moderation_reason?": "+myCar.moderation_reason:""}</p>}
+            {profile?.premium&&<div className="actions"><a className="outline" href={entryUploadHref} target="_top">{t("garageReplace")}</a><button className="outline danger-button" disabled={busy||submissionsClosed||myCar.moderation_state==='pending'||myCar.moderation_state==='rejected'} onClick={()=>{setEditing(myCar);setModal('withdraw');}}>{t("garageDelete")}</button></div>}
+            {submissionsClosed&&<p className="garage-muted">{t("submissionsClosed")}</p>}
+          </>:<><p className="garage-muted">{t("garageNoCar")}</p><a className="primary" href={entryUploadHref} target="_top"><Plus size={18}/>{t("garageUploadCar")}</a>{submissionsClosed&&<p className="garage-muted">{t("submissionsClosed")}</p>}</>}
+        </section>
+        {premiumCard()}
+        <ClubPanel club={data.club} locale={locale} onLogin={()=>setModal("login")}/>
+        {(garage.trophies.length>0||garage.trophyError)&&<section className="panel garage-trophies" data-garage-section="trophies"><div className="garage-section-heading"><h2>{t("garageTrophies")}</h2><a href="/trophies">{t("garageAllTrophies")} <ArrowUpRight size={15}/></a></div>
+          {garage.trophyError?<p className="garage-muted">{t("garageTrophyError")}</p>:<ul>{garage.trophies.slice(0,3).map(award=><li key={award.code}><Trophy size={22}/><div><strong>{t(award.category==='overall'?"roundChampion":"popularChoice")}</strong><p>{award.title} · {award.name}</p><small>{new Intl.DateTimeFormat(locale,{day:"numeric",month:"short",year:"numeric",timeZone:"Europe/Lisbon"}).format(award.issued*1000)}</small></div><a className="outline" href={"/trophies/"+encodeURIComponent(award.code)} aria-label={award.title+" · "+t("garageAllTrophies")}><ArrowUpRight size={17}/></a></li>)}</ul>}
+        </section>}
+        {data.signedIn&&<section className="panel garage-account-actions" data-garage-section="account"><button className="outline danger-button account-delete-button" type="button" disabled={busy} onClick={()=>{setDeletionConfirmed(false);setMessage(null);setModal("deleteAccount");}}>{t("deleteAccount")}</button></section>}
+      </div>}
+
+      {tab!=="feed"&&<footer className="footer">
+        <p>{t("ownerCredit")}</p>
+      </footer>}
     </main>
-    <aside className="social-side"><div className="side-inner">
-      <section className="side-card side-contest"><div className="side-card-title"><span className="side-icon"><Flag size={19}/></span><h2>{st.spotlight}</h2></div>
-        <img src="/garage/r34.webp" alt="Nissan Skyline GT-R R34"/>
-        <h3>{round?.title||t(round?.kind==="weekly"?"weekly":"test")}</h3><p>{round?closed?t("finished"):t("open"):t("challenge")}</p>
-        <div className="side-timer"><Timer size={18}/><strong>{round?closed?t("finished"):fmt(seconds):"00:00:01:00"}</strong></div>
-        {round&&<dl className="side-stats"><div><dt>{t("feed")}</dt><dd>{data.entries?.length??0}</dd></div><div><dt>{t("votes")}</dt><dd>{totalVotes}</dd></div></dl>}
-        <button type="button" className="primary" onClick={action} disabled={busy||closed}><Plus size={17}/>{round?t("enter"):t("oneMinute")}</button>
-      </section>
-      <section className="side-card side-premium"><Crown size={25}/><p className="eyebrow">TURBO CLUB</p><h2>{st.clubText}</h2><p>{st.clubOffer}</p>
-        {data.club&&<><progress value={data.club.progress} max={3} aria-label={st.club}/><small>{data.club.progress} / 3</small></>}
-        <button type="button" onClick={()=>navigate("profile")}>{st.clubOpen}<ArrowUpRight size={17}/></button>
-      </section>
-      <section className="side-card side-how"><h2>{st.how}</h2><ol><li><span>01</span>{st.step1}</li><li><span>02</span>{st.step2}</li><li><span>03</span>{st.step3}</li></ol><button className="text-button" onClick={()=>setModal("rules")}>{t("rules")}<ChevronRight size={16}/></button></section>
-      <p className="side-credit">{t("ownerCredit")}</p>
-    </div></aside>
     </div>
     <nav className="mobile-nav" aria-label="Tune Arena mobile">{sections.slice(0,2).map(n=>{const Icon=navIcons[n];return <button key={n} aria-current={tab===n?"page":undefined} onClick={()=>navigate(n)}><Icon size={22}/><span>{n==="feed"?t("feed"):t(n)}</span></button>;})}
-      <button className="mobile-create" onClick={action} disabled={busy||closed} aria-label={t("enter")}><Plus size={26}/></button><a href="/winners"><Trophy size={22}/><span>{t("winners")}</span></a><button aria-current={tab==="profile"?"page":undefined} onClick={()=>navigate("profile")}><UserRound size={22}/><span>{t("profile")}</span></button></nav>
-    {!modal&&data.club&&<ClubReward club={data.club} locale={locale} busy={busy} onDismiss={()=>void run(async()=>{
+      <a className="mobile-create" href={entryUploadHref} target="_top" aria-label={t("enter")}><Plus size={26}/></a><a href="/winners"><Trophy size={22}/><span>{t("winners")}</span></a><button aria-current={tab==="profile"?"page":undefined} onClick={()=>navigate("profile")}><UserRound size={22}/><span>{t("profile")}</span></button></nav>
+    {tab==="profile"&&!modal&&data.club&&<ClubReward club={data.club} locale={locale} busy={busy} onDismiss={()=>void run(async()=>{
       await api("referrals/ack","POST",{rewardBatches:data.club!.earnedMonths,welcome:data.club!.welcomePending});await load();
     })}/>}
-    {modal && <div className="overlay" onClick={event=>{if(event.target===event.currentTarget)closeModal();}}>
-      <section className="dialog" role="dialog" aria-modal="true" aria-label={t(modal==="entry"?"upload":modal)} onKeyDown={e=>{if(e.key==="Escape")closeModal();}}>
-        <button className="dismiss" autoFocus onClick={closeModal} aria-label={t("close")}>×</button>
-        {modal==="rules" && <><h2>{t("rules")}</h2><p>{t("help")}</p><p>{t("reactionRule")}</p><p>{t("fair")}</p><p>{t("cosmetic")}</p></>}
+    {modal && <div className={"overlay"+(modal==="frames"?" sheet-overlay":"")} onClick={event=>{if(event.target===event.currentTarget)closeModal();}}>
+      <section className={"dialog"+(modal==="frames"?" avatar-sheet":"")} role="dialog" aria-modal="true" aria-label={t(modal==="frames"?"garageAppearance":modal==="premium"?"premium":modal==="withdraw"?"withdrawBuild":modal)} onKeyDown={e=>{if(e.key==="Escape")closeModal();if(e.key==="Tab"){const controls=[...e.currentTarget.querySelectorAll<HTMLElement>('button:not([disabled]),a[href],input:not([disabled]),textarea:not([disabled]),select:not([disabled])')];const first=controls[0],last=controls.at(-1);if(e.shiftKey&&document.activeElement===first&&last){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last&&first){e.preventDefault();first.focus();}}}}>
+        <button className="dismiss" disabled={modal==="deleteAccount"&&busy} autoFocus onClick={closeModal} aria-label={t("close")}>×</button>
+        {modal==="deleteAccount"&&<><h2>{t("deleteAccount")}</h2><p>{t("deleteAccountInfo")}</p><form onSubmit={deleteOwnAccount}><label className="check"><input type="checkbox" required disabled={busy} checked={deletionConfirmed} onChange={e=>setDeletionConfirmed(e.target.checked)}/>{t("deleteAccountConsent")}</label><div className="actions"><button className="primary danger-button" type="submit" disabled={busy||!deletionConfirmed}>{t(busy?"deleteAccountBusy":"deleteAccountConfirm")}</button><button className="outline" type="button" disabled={busy} onClick={closeModal}>{t("cancelDeleteAccount")}</button></div></form></>}
+        {modal==="frames"&&<><span className="sheet-handle" aria-hidden="true"/><h2>{t("garageAppearance")}</h2><div className="garage-frame-row" aria-label={t("frames")}>
+          {frames.map(frame=>{const locked=frame!=="plain"&&!profile?.premium;const equipped=frame===(profile?.premium?profile.frame:"plain");const name=frame==="plain"?t("garageDefaultFrame"):frameTitles[frame];return <button className="garage-frame-option" key={frame} type="button" disabled={busy} aria-label={name+(locked?" · "+t("garageLockedFrame"):"")} aria-pressed={equipped} onClick={()=>chooseFrame(frame)}><span className={"avatar "+frame}>{profile?.avatar?<img src={profile.avatar} alt=""/>:profile?.nickname?.slice(0,1).toUpperCase()??"T"}</span><strong>{name}</strong><span className="garage-frame-state">{locked?<LockKeyhole size={15}/>:equipped?<Check size={15}/>:null}</span></button>;})}
+        </div><a className="outline sheet-photo-action" href="/upload/avatar" target="_top"><Camera size={18}/>{t("garageChangePhoto")}</a></>}
+        {modal==="premium"&&<>{premiumCard()}<p>{t("garagePerks")}</p></>}
+      {modal==="rules" && <><h2>{t("rules")}</h2>{round?.notice&&<p>{round.notice}</p>}{round&&<p>{t("entryDeadline")}: {entryDate(round.submissionsClose)}</p>}{!round?.prize&&<p>{t("usdt")}</p>}<p>{t("help")}</p><p>{t("reactionRule")}</p><p>{t("fair")}</p><p>{t("motorRule")}</p><p>{t("entryLocked")}</p><p>{t("replaceRule")}</p><p>{t("deadlineDefault")}</p></>}
         {modal==="nickname"&&<><h2>{t("nickname")}</h2><p>{t("nicknameHint")}</p><form onSubmit={saveNickname}>
           <label>{t("nickname")}<input name="nickname" autoComplete="nickname" defaultValue={profile?.nickname??""} minLength={3} maxLength={24} required/></label>
           <button className="primary" disabled={busy}>{t("save")}</button></form></>}
-        {modal==="entry" && <><h2>{t("upload")}</h2><form onSubmit={submit}>
-          <label>{t("name")}<input name="name" required maxLength={55}/></label>
-          <label>{t("desc")}<textarea name="description" required maxLength={160} rows={3}/></label>
-          <div className="photo-field-label">{t("photo")}</div><PhotoPicker locale={locale} onChange={setPhoto} onError={()=>setMessage("imageError")} onBusy={setPhotoBusy}/>
-          <label className="check"><input name="rights" type="checkbox" value="yes" required/>{t("rights")}</label>
-          <button className="primary" disabled={busy||photoBusy||!photo}>{t("publish")}</button>
-        </form></>}
+        {modal==="withdraw"&&<><h2>{t("withdrawBuild")}</h2><p>{t("replaceRule")}</p><div className="actions"><button className="primary" disabled={busy||submissionsClosed} onClick={withdraw}>{t("withdrawBuild")}</button><button className="outline" disabled={busy} onClick={closeModal}>{t("close")}</button></div></>}
         {modal==="login" && <><h2>{t("login")}</h2><p>{t("loginText")}</p>
-          {data.providers.local&&!data.signedIn&&<button className="primary" disabled={busy} onClick={()=>void run(async()=>{await api("auth/dev","POST");await load();setModal(null);})}>DEMO · Local driver / Локальный участник</button>}
-          {data.signedIn&&!data.providers.chatgpt&&<button className="outline" onClick={()=>void run(async()=>{await api("auth/logout","POST");location.replace("/");})}>Sign out / Выйти</button>}
-          {!data.signedIn && data.providers.chatgpt && <a className="primary" href={"/signin-with-chatgpt?return_to="+encodeURIComponent(returnTo)} target="_top">{t("access")}</a>}
-          <button className="outline telegram" onClick={()=>data.providers.telegram?location.assign("/api/auth/telegram"):setMessage("unconfigured")}>Telegram</button>
-          <form onSubmit={event=>{event.preventDefault();const email=new FormData(event.currentTarget).get("email");void run(async()=>{await api("auth/email","POST",{email});setMessage("sent");});}}>
-            <label>{t("email")}<input name="email" type="email" required autoComplete="email"/></label><button className="outline" disabled={busy}>{t("send")}</button>
-          </form></>}
+          {!data.signedIn&&<a className="primary" href="/api/auth/telegram" target="_top">{t("telegramAccess")}</a>}
+          {!data.providers.telegram&&<p className="notice">{t("telegramUnavailable")}</p>}</>}
         {message&&<p className="notice" role="status">{t(message)}</p>}
       </section>
     </div>}

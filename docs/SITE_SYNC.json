@@ -1,0 +1,1270 @@
+{
+  "date": "2026-11-11",
+  "source_site_version": 33,
+  "source_commit": "3e2b45e7109cb0f831b5114e1e76237fbee66f56",
+  "github_base_commit": "1d9aee85ad4f4de5cfc1d3dae2898ed4138fd30f",
+  "source_files": [
+    {
+      "path": ".gitignore",
+      "sha": "0ef03ed1ae8b17716270e6ba7d6b628b66eaceb1",
+      "size": 614
+    },
+    {
+      "path": ".npmrc",
+      "sha": "9f274d6425b9792ae0a70cb0b96a29fd98ec6ed6",
+      "size": 45
+    },
+    {
+      "path": ".openai/hosting.json",
+      "sha": "4db975dc352eac0040e5b9e2ea2df415816d120a",
+      "size": 95
+    },
+    {
+      "path": "README.md",
+      "sha": "2e5f6c040b4b328ace23a9dee5af00b395b71d8d",
+      "size": 14265
+    },
+    {
+      "path": "app/admin-panel.tsx",
+      "sha": "79653ee417787051a35a0770332d4ab6b1d4181d",
+      "size": 15105
+    },
+    {
+      "path": "app/admin/page.tsx",
+      "sha": "040fcc6401abff807deb691a5224355c77d6592f",
+      "size": 739
+    },
+    {
+      "path": "app/api/[...action]/route.ts",
+      "sha": "b1fa3b698d8a4fe8c03d4fd150ee153b263692f1",
+      "size": 17499
+    },
+    {
+      "path": "app/arena.tsx",
+      "sha": "f005a174a256bf09d23d1769782a0b681e83d667",
+      "size": 30261
+    },
+    {
+      "path": "app/business/business-panel.tsx",
+      "sha": "cf0ece226a822fd1d77af4f949dd810c507d9b4c",
+      "size": 11287
+    },
+    {
+      "path": "app/business/page.tsx",
+      "sha": "cbe481b75c1132d3da334b35e9f26504e3d53d14",
+      "size": 300
+    },
+    {
+      "path": "app/chatgpt-auth.ts",
+      "sha": "a0ae2ed9a9771b5fc36a06af554a05c18b2a13b3",
+      "size": 2550
+    },
+    {
+      "path": "app/club-panel.tsx",
+      "sha": "fe911b3b74cd8a269fca5605f16452f600230b54",
+      "size": 2256
+    },
+    {
+      "path": "app/commerce-shell.tsx",
+      "sha": "6487341df46397af22cec90c0ece5b731f101763",
+      "size": 2784
+    },
+    {
+      "path": "app/globals.css",
+      "sha": "caa1c55326c0ad8b0c3bb8e3b106e12ea5b61bd6",
+      "size": 65147
+    },
+    {
+      "path": "app/install/install-client.tsx",
+      "sha": "a6614c49b75cfc2f4ecc9f3f57f9b096bc546568",
+      "size": 19499
+    },
+    {
+      "path": "app/install/install-help.ts",
+      "sha": "baa27362e5780a05813050a6f9fafecfa2b5c39d",
+      "size": 6974
+    },
+    {
+      "path": "app/install/install.css",
+      "sha": "056f47da9b4f421fd0f1078c27e3a1f9a2cce33e",
+      "size": 5828
+    },
+    {
+      "path": "app/install/page.tsx",
+      "sha": "d1f4f739a187e62b671e8abf0982096607c21214",
+      "size": 625
+    },
+    {
+      "path": "app/layout.tsx",
+      "sha": "d9569d745321831da0d0ff63807f7a92586873aa",
+      "size": 786
+    },
+    {
+      "path": "app/page.tsx",
+      "sha": "564060e72a59c064224f2fad11215d1d05063a6c",
+      "size": 810
+    },
+    {
+      "path": "app/partners/page.tsx",
+      "sha": "33db8dbd081b689041e115780d3c347683548703",
+      "size": 96
+    },
+    {
+      "path": "app/photo-picker.tsx",
+      "sha": "f33c572a2089ade24b9d7e1221f0032ae9badb3c",
+      "size": 6142
+    },
+    {
+      "path": "app/pwa-runtime.tsx",
+      "sha": "07bfb61ede96ab9538e9a6713490381093f96e7b",
+      "size": 408
+    },
+    {
+      "path": "app/retry-submission.tsx",
+      "sha": "26e2fa05384fd99b7cfa1dce2b5395b5e147094a",
+      "size": 2077
+    },
+    {
+      "path": "app/section-header.tsx",
+      "sha": "d6392fd95ef1da34cd3bef6467c4f98892094fc9",
+      "size": 1740
+    },
+    {
+      "path": "app/shop/page.tsx",
+      "sha": "77244f99b37eacbd6f7f80f9e20c1d355255aab6",
+      "size": 7810
+    },
+    {
+      "path": "app/sponsor-placements.tsx",
+      "sha": "67aa75e67b48a5a4dc3669cacb57dfb1d9c90d43",
+      "size": 3226
+    },
+    {
+      "path": "app/staff-access.tsx",
+      "sha": "33274953c3fbef606043f5004ad5a31b10c7309b",
+      "size": 4459
+    },
+    {
+      "path": "app/tour-demo/page.tsx",
+      "sha": "b9330eb5f791194ddff6a7ab581e16f2ec12c3a2",
+      "size": 456
+    },
+    {
+      "path": "app/tour-demo/tour-demo.tsx",
+      "sha": "e818a08060e36c55f5c26ca6bb668d3168f5fe8f",
+      "size": 3162
+    },
+    {
+      "path": "app/tour-list.tsx",
+      "sha": "4bb7ec70ce0b1bb4e0d5da05c9d19350d9319201",
+      "size": 1863
+    },
+    {
+      "path": "app/trophies/[code]/page.tsx",
+      "sha": "7c12ab9c5a6ef1fb3c841a8494ad20cd26f0b50e",
+      "size": 182
+    },
+    {
+      "path": "app/trophies/page.tsx",
+      "sha": "851825ab78dd8db521757670dc06d96df6612c02",
+      "size": 97
+    },
+    {
+      "path": "app/trophies/trophy-panel.tsx",
+      "sha": "fca0e30da8b4c66a2712106041c24196b3ac2052",
+      "size": 3761
+    },
+    {
+      "path": "app/upload/[kind]/page.tsx",
+      "sha": "73ce2ff92604e26ef2fe057669521f428ae35449",
+      "size": 839
+    },
+    {
+      "path": "app/upload/upload-panel.tsx",
+      "sha": "f6a934c556ffc9f212c35b814739c95c3b6b5802",
+      "size": 7204
+    },
+    {
+      "path": "app/welcome.tsx",
+      "sha": "dc8044c7bc16d81b4847d2522d54c1b724e98113",
+      "size": 4030
+    },
+    {
+      "path": "app/winners/page.tsx",
+      "sha": "1ebf3d2e507a65bc94cbbe80625c0efaffc47ea9",
+      "size": 410
+    },
+    {
+      "path": "app/winners/winners-panel.tsx",
+      "sha": "0362ff5a3b00fb203edf0b906f84678bd8b1e6a2",
+      "size": 3908
+    },
+    {
+      "path": "cloudflare-env.d.ts",
+      "sha": "856e090c902917b4e1cebee0e08ea1d398fd01c3",
+      "size": 99
+    },
+    {
+      "path": "components.json",
+      "sha": "c8f5bb16f79ed774f67415a8dc2b4a38243e3e90",
+      "size": 420
+    },
+    {
+      "path": "components/connector-error.tsx",
+      "sha": "3c994dc58811e4b02250092fec54b0b788edcc2c",
+      "size": 1082
+    },
+    {
+      "path": "components/race-track-icon.tsx",
+      "sha": "20622629fe1e63afb53987c0076d3bf4c8670073",
+      "size": 631
+    },
+    {
+      "path": "components/turbo-icon.tsx",
+      "sha": "aafd4470377e08d17ea3c7229aaf418c2d9caf6c",
+      "size": 548
+    },
+    {
+      "path": "components/ui/accordion.tsx",
+      "sha": "91e3a250ce6ee0797b0258454d774800650adcc8",
+      "size": 2048
+    },
+    {
+      "path": "components/ui/alert-dialog.tsx",
+      "sha": "dad327341382f200b84d5f833eb1b7a74b0e7469",
+      "size": 5439
+    },
+    {
+      "path": "components/ui/alert.tsx",
+      "sha": "f99164ed4b320790482f514342dab5e72f284aca",
+      "size": 1614
+    },
+    {
+      "path": "components/ui/aspect-ratio.tsx",
+      "sha": "57e38fa96f9c0cb767d7b8de0d6dbc171d1b921a",
+      "size": 274
+    },
+    {
+      "path": "components/ui/attachment.tsx",
+      "sha": "5bdd1ce7db5800eb55198cd0291a1e47dc67fb0d",
+      "size": 6002
+    },
+    {
+      "path": "components/ui/avatar.tsx",
+      "sha": "ea658505703a577fe93341e5e1a0b478c27245f7",
+      "size": 2916
+    },
+    {
+      "path": "components/ui/badge.tsx",
+      "sha": "6eb2a057aae0e23a74368cc4daf9657210e9a740",
+      "size": 1776
+    },
+    {
+      "path": "components/ui/breadcrumb.tsx",
+      "sha": "004bb63a4c92229e612b6126d79fb7b078aa7565",
+      "size": 2350
+    },
+    {
+      "path": "components/ui/bubble.tsx",
+      "sha": "792146e61d80ef595d032d5d09a3d572d50f1374",
+      "size": 4699
+    },
+    {
+      "path": "components/ui/button-group.tsx",
+      "sha": "cd550d7afca6562548afe3f595b352406f7f3951",
+      "size": 2202
+    },
+    {
+      "path": "components/ui/button.tsx",
+      "sha": "4d38506cee5430d95a59ec6a2a0cef2b79217e7a",
+      "size": 2392
+    },
+    {
+      "path": "components/ui/calendar.tsx",
+      "sha": "5d31419b130a18c52320f5a21546a9236123b6bf",
+      "size": 7832
+    },
+    {
+      "path": "components/ui/card.tsx",
+      "sha": "acf57dc5a534792273b8fb86227e92e001f3dc53",
+      "size": 1987
+    },
+    {
+      "path": "components/ui/carousel.tsx",
+      "sha": "0e05a77ea155fde6af5d9a4848b1d3953df6ea5a",
+      "size": 5556
+    },
+    {
+      "path": "components/ui/chart.tsx",
+      "sha": "9813c584e125847d88e9e7e7f9edff7e9ba45a97",
+      "size": 10614
+    },
+    {
+      "path": "components/ui/checkbox.tsx",
+      "sha": "f5a7e433f3795b82a00c5c06a1fc6decf116a84a",
+      "size": 1214
+    },
+    {
+      "path": "components/ui/collapsible.tsx",
+      "sha": "2f7a4e7fc64a8874373c1584646a63f28cd63c47",
+      "size": 795
+    },
+    {
+      "path": "components/ui/combobox.tsx",
+      "sha": "2415bd801031a16bbcee8343058825feecfaea69",
+      "size": 9158
+    },
+    {
+      "path": "components/ui/command.tsx",
+      "sha": "8fe3ccb406be52d28961b0c0220e87ecd19596ca",
+      "size": 4818
+    },
+    {
+      "path": "components/ui/context-menu.tsx",
+      "sha": "5aaca76552cf0468b1def03c9e2c42f1f0b60734",
+      "size": 8268
+    },
+    {
+      "path": "components/ui/dialog.tsx",
+      "sha": "84bdef4bb307087da1bfaf3cadf7be5dbda73f24",
+      "size": 4303
+    },
+    {
+      "path": "components/ui/direction.tsx",
+      "sha": "22e165774bd595fbf41d0c45efef1cf996897983",
+      "size": 506
+    },
+    {
+      "path": "components/ui/drawer.tsx",
+      "sha": "ad08671442203fe345093f364696bdf43528e0b7",
+      "size": 4255
+    },
+    {
+      "path": "components/ui/dropdown-menu.tsx",
+      "sha": "ae1fcf62f1e3b648554789b8fe02943d92bf00fc",
+      "size": 8418
+    },
+    {
+      "path": "components/ui/empty.tsx",
+      "sha": "ce4b0095f6d19d2eae2e465060e9060b0c210856",
+      "size": 2396
+    },
+    {
+      "path": "components/ui/field.tsx",
+      "sha": "ec849dae4d3dd06a973ba22e4b2248a25cf18148",
+      "size": 6159
+    },
+    {
+      "path": "components/ui/form.tsx",
+      "sha": "f371fea1bc35380d28678c6cf53df8f65deb2776",
+      "size": 3757
+    },
+    {
+      "path": "components/ui/hover-card.tsx",
+      "sha": "91e869c0d3091cbeddf5cb0266e82ddf56f829a6",
+      "size": 1526
+    },
+    {
+      "path": "components/ui/input-group.tsx",
+      "sha": "a7652d936fffd9c5bca4b88e6b9715bf559e667d",
+      "size": 5065
+    },
+    {
+      "path": "components/ui/input-otp.tsx",
+      "sha": "6a556afacd71996bf0e385ff2b04869fb2ee4523",
+      "size": 2254
+    },
+    {
+      "path": "components/ui/input.tsx",
+      "sha": "f1124aea14eee062fc2f4c55dad5f0d9de0ccc1a",
+      "size": 962
+    },
+    {
+      "path": "components/ui/item.tsx",
+      "sha": "d5dbb1a9c2e70456e45a39887a4b7cc56d484a45",
+      "size": 4486
+    },
+    {
+      "path": "components/ui/kbd.tsx",
+      "sha": "2459224fbc531f6306b73aaeb22e9022d9985332",
+      "size": 862
+    },
+    {
+      "path": "components/ui/label.tsx",
+      "sha": "1ac80f701ebfe9dc02d632c08cafade732e46625",
+      "size": 606
+    },
+    {
+      "path": "components/ui/marker.tsx",
+      "sha": "cfa76c6c014ab342befcbf7571eb932917406522",
+      "size": 1864
+    },
+    {
+      "path": "components/ui/menubar.tsx",
+      "sha": "4af16a428377f81cbb3f66adfe518308e0b690d8",
+      "size": 8389
+    },
+    {
+      "path": "components/ui/message-scroller.tsx",
+      "sha": "0b05011259c026a357380c3834bce0ead8565d22",
+      "size": 3992
+    },
+    {
+      "path": "components/ui/message.tsx",
+      "sha": "53437e8db2b0fad1da06a7499e54ddaf116295c2",
+      "size": 2232
+    },
+    {
+      "path": "components/ui/native-select.tsx",
+      "sha": "3058398399ad6c029ad527052475b360b114715b",
+      "size": 1995
+    },
+    {
+      "path": "components/ui/navigation-menu.tsx",
+      "sha": "0a673f513c97fbeaae0872403b7582ab2ba7e3c3",
+      "size": 6658
+    },
+    {
+      "path": "components/ui/pagination.tsx",
+      "sha": "1dcfb0cc050c5f2bdd930522d627313d03d3690c",
+      "size": 2717
+    },
+    {
+      "path": "components/ui/popover.tsx",
+      "sha": "30058c4ec284ca9cad1ed1162d084ce3cd94e2b0",
+      "size": 2357
+    },
+    {
+      "path": "components/ui/progress.tsx",
+      "sha": "b3ae25089ad549b7f13125e482f99b43dd895bd2",
+      "size": 755
+    },
+    {
+      "path": "components/ui/radio-group.tsx",
+      "sha": "fe514536ed771f7adef0a6b9e4d1aeadc2c95481",
+      "size": 1460
+    },
+    {
+      "path": "components/ui/resizable.tsx",
+      "sha": "a76832a10b4c5c2a137e25c16478567ba86daf0d",
+      "size": 1815
+    },
+    {
+      "path": "components/ui/scroll-area.tsx",
+      "sha": "73c4eb1cdcd4a699b150a9ddc3e87bfb90b63d09",
+      "size": 1639
+    },
+    {
+      "path": "components/ui/select.tsx",
+      "sha": "c0dc7120b4f78008ae5efc6d1c8b7ec8205c35d5",
+      "size": 6353
+    },
+    {
+      "path": "components/ui/separator.tsx",
+      "sha": "cd873e3631b571060f166897b7b62e033e87c18f",
+      "size": 694
+    },
+    {
+      "path": "components/ui/sheet.tsx",
+      "sha": "cb53bb28b6850745c9519e8e7462e05f85a50c93",
+      "size": 4188
+    },
+    {
+      "path": "components/ui/sidebar.tsx",
+      "sha": "f5f6c5aefc88ffa2e999e284b299472215c05161",
+      "size": 21526
+    },
+    {
+      "path": "components/ui/skeleton.tsx",
+      "sha": "3ec6be770b846170b8e7f8916e5f165e2d1730df",
+      "size": 276
+    },
+    {
+      "path": "components/ui/slider.tsx",
+      "sha": "46ebc4b4df1e9baf1f3997a4b6c08ef80c84a9c9",
+      "size": 1991
+    },
+    {
+      "path": "components/ui/sonner.tsx",
+      "sha": "9b20afe2e10fd9b94d1abc1ae732054b2fb9821c",
+      "size": 1034
+    },
+    {
+      "path": "components/ui/spinner.tsx",
+      "sha": "a70e713c5b4ecb2af186efe3fadea51805f26ba5",
+      "size": 331
+    },
+    {
+      "path": "components/ui/switch.tsx",
+      "sha": "8baa844fdb17d668b3ce07cfbd6a7ef52e2eb5eb",
+      "size": 1408
+    },
+    {
+      "path": "components/ui/table.tsx",
+      "sha": "7add5f1a22db954ac6cb3446f1bf8c8a9fc5c335",
+      "size": 2478
+    },
+    {
+      "path": "components/ui/tabs.tsx",
+      "sha": "b463afd170637df477e36184aa27d2ad1bd3c3e0",
+      "size": 3782
+    },
+    {
+      "path": "components/ui/textarea.tsx",
+      "sha": "e67d8fefe50c41dfa2deed9a5096d5be7691581a",
+      "size": 759
+    },
+    {
+      "path": "components/ui/toggle-group.tsx",
+      "sha": "9894607b212ff7182bf2024f4262da03df0a8973",
+      "size": 2308
+    },
+    {
+      "path": "components/ui/toggle.tsx",
+      "sha": "5250c98ff7f11f531af38c227230a76b7d25bf19",
+      "size": 1565
+    },
+    {
+      "path": "components/ui/tooltip.tsx",
+      "sha": "ec65c1e4255f050d9555c6cdade90a5f8a6c0c29",
+      "size": 1830
+    },
+    {
+      "path": "contracts/TuneArenaTrophy.sol",
+      "sha": "a54696db260a6c0d89fbb3913ed4f96ef3d371ea",
+      "size": 661
+    },
+    {
+      "path": "contracts/artifacts/TuneArenaTrophy.json",
+      "sha": "da8b142c9f8e563d3646d15ff9fef36657c6ad43",
+      "size": 23472
+    },
+    {
+      "path": "db/index.ts",
+      "sha": "19b379900d94124b674f07ffe2dbba8f70bd8d6d",
+      "size": 423
+    },
+    {
+      "path": "db/schema.ts",
+      "sha": "5d5693a7f59ac01c944fed0400aa5f62eff02610",
+      "size": 14716
+    },
+    {
+      "path": "docs/AVATARS_PODIUM_2026-11-09_RU.md",
+      "sha": "c6dbb66942aeb6c90de1d36cd1299f00f07336a4",
+      "size": 4030
+    },
+    {
+      "path": "docs/COMMERCIAL_IMPLEMENTATION_RU.md",
+      "sha": "a23254b8827bbece1ecb96fd1fcfd1d8626b6916",
+      "size": 6895
+    },
+    {
+      "path": "docs/ORGANIZER_ACCESS_2026-11-09_RU.md",
+      "sha": "e003f6aaa4eace5a6433e2efbabbd739584f9555",
+      "size": 6362
+    },
+    {
+      "path": "docs/UI_VALIDATION_2026-11-08_RU.md",
+      "sha": "a6f4b9e054555efa95aabd87695342c6da15df32",
+      "size": 4357
+    },
+    {
+      "path": "drizzle.config.ts",
+      "sha": "c2b2f34376984744343453838ce66658ad9d9b6a",
+      "size": 148
+    },
+    {
+      "path": "drizzle/0000_third_radioactive_man.sql",
+      "sha": "ed22d4c107e73feb4f98b20772372dfe43454dab",
+      "size": 1814
+    },
+    {
+      "path": "drizzle/0001_zippy_mattie_franklin.sql",
+      "sha": "de861b3bb550b126fef726e69ac3be9babc067a1",
+      "size": 1570
+    },
+    {
+      "path": "drizzle/0002_striped_mandrill.sql",
+      "sha": "1ed4ff9b4f531775cca7261597ed6eb0726e2b6e",
+      "size": 1035
+    },
+    {
+      "path": "drizzle/0003_lumpy_shaman.sql",
+      "sha": "f5f61025997b0e1028e25671b78c3800ba23304d",
+      "size": 1129
+    },
+    {
+      "path": "drizzle/0004_burly_senator_kelly.sql",
+      "sha": "cb1b99fde23bc3113aafa7ae028ac9f8344d2bb7",
+      "size": 936
+    },
+    {
+      "path": "drizzle/0005_charged_garage.sql",
+      "sha": "7f43d09ab188fa0ceede89ab12bc6131652368ad",
+      "size": 2386
+    },
+    {
+      "path": "drizzle/0006_build_replacement.sql",
+      "sha": "cf467b3c809a2a3d5e166b8fd02d48364b8c465c",
+      "size": 1519
+    },
+    {
+      "path": "drizzle/0007_commerce.sql",
+      "sha": "f565123416b1c9a97f727242e4ff67857f32448e",
+      "size": 6979
+    },
+    {
+      "path": "drizzle/0008_dear_jimmy_woo.sql",
+      "sha": "432337efb1d9c6464cfe19c1b40925602d62e1c8",
+      "size": 198
+    },
+    {
+      "path": "drizzle/0009_blushing_junta.sql",
+      "sha": "b2e5a4a21f301ea9ad84d55c75914f1bfb0bb0f6",
+      "size": 1163
+    },
+    {
+      "path": "drizzle/0010_fearless_epoch.sql",
+      "sha": "7ae2105f5bdd4d812fc985bef472dc11d637dd02",
+      "size": 1300
+    },
+    {
+      "path": "drizzle/0011_pretty_lifeguard.sql",
+      "sha": "2797c7a55c4ee954bcf5fe397ca88e60a73b9bea",
+      "size": 5723
+    },
+    {
+      "path": "drizzle/meta/0000_snapshot.json",
+      "sha": "6cdea3cf4bb66edcb2e82d840a87ca1a7378a698",
+      "size": 9378
+    },
+    {
+      "path": "drizzle/meta/0001_snapshot.json",
+      "sha": "3837f7589d94823bb9720cce87d821214629102c",
+      "size": 14871
+    },
+    {
+      "path": "drizzle/meta/0002_snapshot.json",
+      "sha": "95b37d72f5539e39db705bd66c21b81acd949f78",
+      "size": 18251
+    },
+    {
+      "path": "drizzle/meta/0003_snapshot.json",
+      "sha": "30c155878cf1f3b36da037242b3ce2ffbe681851",
+      "size": 22959
+    },
+    {
+      "path": "drizzle/meta/0004_snapshot.json",
+      "sha": "288871b298f5f2d118de4768b222bd24049f203a",
+      "size": 23174
+    },
+    {
+      "path": "drizzle/meta/0005_snapshot.json",
+      "sha": "5419408af15e2c8cfa243d91fb6c438147bd0453",
+      "size": 29580
+    },
+    {
+      "path": "drizzle/meta/0006_snapshot.json",
+      "sha": "c39d1dfe9554aed4827b207ec1baa541e3fa5a0b",
+      "size": 30436
+    },
+    {
+      "path": "drizzle/meta/0007_snapshot.json",
+      "sha": "fa0b97874dc22b17a7dcc9c36369674c3521910b",
+      "size": 60829
+    },
+    {
+      "path": "drizzle/meta/0008_snapshot.json",
+      "sha": "ae7b68934f110a02cd7850d2afaac95b701395ca",
+      "size": 61734
+    },
+    {
+      "path": "drizzle/meta/0009_snapshot.json",
+      "sha": "b391ce16ac441984d0562858b01369113a8d5ce4",
+      "size": 67080
+    },
+    {
+      "path": "drizzle/meta/0010_snapshot.json",
+      "sha": "92d01f83f84ac5b3fe904a273a4271f3bbb67fec",
+      "size": 67182
+    },
+    {
+      "path": "drizzle/meta/0011_snapshot.json",
+      "sha": "87587341ddb5fd7b899e7095c04c5c30ad37802f",
+      "size": 68183
+    },
+    {
+      "path": "drizzle/meta/_journal.json",
+      "sha": "d80b6430b20faaeb430188efea95f2404f11ec9e",
+      "size": 1786
+    },
+    {
+      "path": "eslint.config.mjs",
+      "sha": "6600a56ae006c77b1143fcddc8e8ded4e724309b",
+      "size": 791
+    },
+    {
+      "path": "examples/d1/app/api/notes/route.ts",
+      "sha": "07f8318c3c290d68163e95aa3e170ad92a235f27",
+      "size": 1700
+    },
+    {
+      "path": "examples/d1/db/schema.ts",
+      "sha": "7bb0c157110799b9b53c767517e0d192b7201f2e",
+      "size": 370
+    },
+    {
+      "path": "hooks/use-mobile.ts",
+      "sha": "2b0fe1dfef3b17850bbac040665f514a8ffd0f15",
+      "size": 565
+    },
+    {
+      "path": "lib/access-strings.ts",
+      "sha": "4d729921f918ab983fce5692078f799762c21f4f",
+      "size": 9104
+    },
+    {
+      "path": "lib/access.ts",
+      "sha": "0176ce18a1138ec183a7c41a07a16b77682b0d6d",
+      "size": 5469
+    },
+    {
+      "path": "lib/account.ts",
+      "sha": "b5fef3a7c4f7225c4ae5d48a8e54a032fb35cd92",
+      "size": 4420
+    },
+    {
+      "path": "lib/auth.ts",
+      "sha": "b24c6c2f095065ac8c082e8018d84c940fa22556",
+      "size": 5876
+    },
+    {
+      "path": "lib/avatar.ts",
+      "sha": "2b994a781d3b0702fadb55c67216120b724c944b",
+      "size": 1964
+    },
+    {
+      "path": "lib/catalog.ts",
+      "sha": "a8ce073dca440a4ef5695b27e7d18398bd1ebef4",
+      "size": 11654
+    },
+    {
+      "path": "lib/charged.ts",
+      "sha": "80de169f41a69e933914ef4ef9ebb8d22923289b",
+      "size": 2334
+    },
+    {
+      "path": "lib/client.ts",
+      "sha": "2463f0ba1f2678a2e419abf2bee336a73bf53361",
+      "size": 1192
+    },
+    {
+      "path": "lib/club-strings.ts",
+      "sha": "f4e538b85a388535168a3e92822825e93d916076",
+      "size": 9602
+    },
+    {
+      "path": "lib/commerce-utils.ts",
+      "sha": "73dd0069c49294e239feca8df2372d018e6d7beb",
+      "size": 1234
+    },
+    {
+      "path": "lib/commerce.ts",
+      "sha": "4a0a63102eef1c45f71864d8f148879e8626ba96",
+      "size": 15296
+    },
+    {
+      "path": "lib/connector-context.ts",
+      "sha": "6cdeac72bf2df63e0a73159af25e0b4564ed1d43",
+      "size": 612
+    },
+    {
+      "path": "lib/connector-contract.mts",
+      "sha": "f146418508b4c272a4495ec5498b6f0554b1f966",
+      "size": 5362
+    },
+    {
+      "path": "lib/connector-errors.mts",
+      "sha": "c9d2fe845ec965062d3724fd28a0892b4fbf5a9b",
+      "size": 2717
+    },
+    {
+      "path": "lib/connector-preview.d.ts",
+      "sha": "bb3f498b67e3dfd93601626aa2675af07dfe711c",
+      "size": 433
+    },
+    {
+      "path": "lib/connectors.ts",
+      "sha": "30b85c0dd699e7236ec1694e03466b03caa2a7dc",
+      "size": 416
+    },
+    {
+      "path": "lib/deadlines.ts",
+      "sha": "e84fdc11f594e774bcdddd606bbcc1430bdc11e6",
+      "size": 552
+    },
+    {
+      "path": "lib/garage.ts",
+      "sha": "3e7afae760aa0062bad98063d081a36cc25f8f09",
+      "size": 1722
+    },
+    {
+      "path": "lib/install-platform.mjs",
+      "sha": "1008ca007a96fd7d0db5560a88f4e3aad84d0368",
+      "size": 743
+    },
+    {
+      "path": "lib/locale.ts",
+      "sha": "d37527cf4d1bd01001b01cfbc123491f55945ba3",
+      "size": 721
+    },
+    {
+      "path": "lib/photo-strings.ts",
+      "sha": "2baca4f4ff1575324496ef2c09f59cc8b2463208",
+      "size": 5966
+    },
+    {
+      "path": "lib/photo.ts",
+      "sha": "d4f56b032e7c4001ad0d6c633fa8e2773f124f9b",
+      "size": 4190
+    },
+    {
+      "path": "lib/promotions.ts",
+      "sha": "ac4a815c83f504c92a6f06997c4943d88d753fde",
+      "size": 2021
+    },
+    {
+      "path": "lib/referral-sql.ts",
+      "sha": "dd6b1816987824970dfee74aef4f1d38d08e850a",
+      "size": 2268
+    },
+    {
+      "path": "lib/referrals.ts",
+      "sha": "9da2df0c1f9247b701422bd139c867d320a2b2cd",
+      "size": 3472
+    },
+    {
+      "path": "lib/replacement.ts",
+      "sha": "eae8c041a72c990bfb63ab829ccd4b9d9cfbca42",
+      "size": 3120
+    },
+    {
+      "path": "lib/results.ts",
+      "sha": "abaa931f5983d3d3c4436015e1e1b0544d3d4737",
+      "size": 8993
+    },
+    {
+      "path": "lib/round-sql.ts",
+      "sha": "2e9222cf3dd5972b0a9b600275f9ce2d1febd254",
+      "size": 3522
+    },
+    {
+      "path": "lib/social-strings.ts",
+      "sha": "994f657091480daaaf7ee36ae82aee222cc5f89a",
+      "size": 4406
+    },
+    {
+      "path": "lib/sponsorship.ts",
+      "sha": "df7215fec00735d1c96ed3d10240ca15d4945adc",
+      "size": 6949
+    },
+    {
+      "path": "lib/strings.ts",
+      "sha": "22b41122e886390cd57b8384ee9ab72727bff7d8",
+      "size": 54281
+    },
+    {
+      "path": "lib/submission-deadline.mjs",
+      "sha": "0df9adb7fd9277294a6365b329b1379eda6b3775",
+      "size": 1236
+    },
+    {
+      "path": "lib/trophies.ts",
+      "sha": "ca1042ea7a932f3b4f373247e4be629bdfa51703",
+      "size": 5446
+    },
+    {
+      "path": "lib/upload-image.ts",
+      "sha": "e62b89fd41cab30d45048470576bcddfcbef316b",
+      "size": 1026
+    },
+    {
+      "path": "lib/utils.ts",
+      "sha": "b500fb167fdaa78785feb0ff03b51f8a182a44ae",
+      "size": 177
+    },
+    {
+      "path": "lib/worker.ts",
+      "sha": "1de8f7c366365a6db804a54b285b957c6c240666",
+      "size": 2909
+    },
+    {
+      "path": "next.config.ts",
+      "sha": "e9ffa3083ad279ecf95fd8eae59cb253e9a539c4",
+      "size": 133
+    },
+    {
+      "path": "package-lock.json",
+      "sha": "b167c1df0ad2d0b3d22144ac6d172994fbb0d673",
+      "size": 528858
+    },
+    {
+      "path": "package.json",
+      "sha": "454a1aac06163b4a3319e078d670b869a23be12f",
+      "size": 2597
+    },
+    {
+      "path": "postcss.config.mjs",
+      "sha": "61e36849cf7cfa9f1f71b4a3964a4953e3e243d3",
+      "size": 94
+    },
+    {
+      "path": "public/cars/arc.svg",
+      "sha": "377d56de0076496469ffacf562b6d8c6356b82ea",
+      "size": 2410
+    },
+    {
+      "path": "public/cars/flare.svg",
+      "sha": "6f9f4dceda1156cf0f690b43f3bdaecd9a270996",
+      "size": 2410
+    },
+    {
+      "path": "public/cars/night.svg",
+      "sha": "2e1b592ff9f38978f0b5c7ff750a536454dcd221",
+      "size": 2410
+    },
+    {
+      "path": "public/downloads/SHA256SUMS.txt",
+      "sha": "19b47c0e9b9cf93bfa3e676f024680f8bd2e2c5d",
+      "size": 93
+    },
+    {
+      "path": "public/downloads/Tune-Arena-1.0.0-debug.apk",
+      "sha": "10028c41439cea4e7f8ece6dda5276597c44c97c",
+      "size": 51504
+    },
+    {
+      "path": "public/favicon.svg",
+      "sha": "ca747cb66b233fedec5ff0c84f97bb4631c05dbf",
+      "size": 712
+    },
+    {
+      "path": "public/garage/86.webp",
+      "sha": "efe40a10f625080019b8c481c59be70832914026",
+      "size": 220734
+    },
+    {
+      "path": "public/garage/r34.webp",
+      "sha": "e5d268fcf4887a26b24ef886e38e112a5523351f",
+      "size": 166376
+    },
+    {
+      "path": "public/garage/sti.webp",
+      "sha": "a7495c8090242b8eb42c15a7ee5e6cb83b8b74b0",
+      "size": 246706
+    },
+    {
+      "path": "public/garage/turbo.webp",
+      "sha": "bea8b598f7b13a511b0897e9ca2f04b1a52f211a",
+      "size": 103344
+    },
+    {
+      "path": "public/garage/wheel.webp",
+      "sha": "d09afaad6d31534e454b48e3e5f6debe33246635",
+      "size": 73380
+    },
+    {
+      "path": "public/icons/apple-touch-icon.png",
+      "sha": "599367df4a719419aa3b05b2a2ad5fb41990d17f",
+      "size": 5746
+    },
+    {
+      "path": "public/icons/icon-192.png",
+      "sha": "893b4bd81c736e672bfc44474e9eae05a3f75267",
+      "size": 6050
+    },
+    {
+      "path": "public/icons/icon-512.png",
+      "sha": "ea327566b6c7f7d5802ac64ec77cb06cf28caa5e",
+      "size": 12923
+    },
+    {
+      "path": "public/images/tune-arena-expo.webp",
+      "sha": "df5d503ff9c5f0b4a382f9c177efb82c549dde4b",
+      "size": 338104
+    },
+    {
+      "path": "public/manifest.webmanifest",
+      "sha": "c1f60638d57c583002281f9ba8da8b4df512e0f0",
+      "size": 646
+    },
+    {
+      "path": "public/offline.html",
+      "sha": "18fdc77b92277527862087e28441d59ad4242d8a",
+      "size": 1083
+    },
+    {
+      "path": "public/sw.js",
+      "sha": "8adc664999df69991abe5010b5f7c6c00e748976",
+      "size": 1381
+    },
+    {
+      "path": "scripts/build-verified.sh",
+      "sha": "6c69cf3ad6855c25c312b67f02fd1afffb97b63d",
+      "size": 661
+    },
+    {
+      "path": "scripts/check-trophy-contract.mjs",
+      "sha": "d16c92b345abcfa9aed4db5c75e663ac7a6e57d2",
+      "size": 1206
+    },
+    {
+      "path": "scripts/connector-preview/connector-preview-session.mjs",
+      "sha": "aa2d2d92f663e547e4af956e3f0475a6198b1bf2",
+      "size": 6855
+    },
+    {
+      "path": "scripts/connector-preview/host-binding.mjs",
+      "sha": "88e6efb56e6ceb044dd3c9127d26960b5bb9c5e9",
+      "size": 7793
+    },
+    {
+      "path": "scripts/connector-preview/protocol.mjs",
+      "sha": "6476ba302de4ee408ba549fc0d790861185dd919",
+      "size": 1781
+    },
+    {
+      "path": "scripts/connector-preview/worker.mjs",
+      "sha": "5ab638e8b4e34767e39a1d224cc9f3dd9c28c4c9",
+      "size": 618
+    },
+    {
+      "path": "scripts/deploy-trophy-contract.mjs",
+      "sha": "094a2c2a90a0a8feeab792be08311a983077b215",
+      "size": 844
+    },
+    {
+      "path": "scripts/execution-profile.mjs",
+      "sha": "f27aec211320d9a5fd0dbbb07f5c508222b2b8d4",
+      "size": 624
+    },
+    {
+      "path": "scripts/install-ci.mjs",
+      "sha": "22bd7d555c8f2a996d5bfe5be0ba9a5a43a1bf7f",
+      "size": 1685
+    },
+    {
+      "path": "scripts/install-ci.sh",
+      "sha": "7b4a810e1663afb4572d167eb78e09b3db07be10",
+      "size": 6783
+    },
+    {
+      "path": "scripts/install-pnpm.sh",
+      "sha": "573ecdb89461a5922386ec9ccf5a83504fa9caae",
+      "size": 9015
+    },
+    {
+      "path": "scripts/npm-install.mjs",
+      "sha": "64ade63f6092ed209b1a76718145d80de38b34f2",
+      "size": 7025
+    },
+    {
+      "path": "scripts/pnpm-install.mjs",
+      "sha": "ae92c9fe150ee780e46f590947ceacd03b7226ad",
+      "size": 10633
+    },
+    {
+      "path": "scripts/run-framework.mjs",
+      "sha": "166b0c2487819135ddfb30c9267e790ebb8c498f",
+      "size": 993
+    },
+    {
+      "path": "scripts/sites-env.mjs",
+      "sha": "a90ace6dff612ac554fe710d8212d5222bcf9e9b",
+      "size": 522
+    },
+    {
+      "path": "scripts/sites-env.sh",
+      "sha": "d656010b7e14323be160dd4ecbac6760d1789000",
+      "size": 1600
+    },
+    {
+      "path": "scripts/tool-environment.mjs",
+      "sha": "66d5f0ebd083f922be28c983e0a6d5de06e60e46",
+      "size": 791
+    },
+    {
+      "path": "scripts/vite/connector-preview-plugin.mjs",
+      "sha": "f29e9953bdac6f25be5f1b58e5a02ef0457bafbe",
+      "size": 7211
+    },
+    {
+      "path": "scripts/vite/sites-vite-plugin.LICENSE",
+      "sha": "4243cb4a9aaa50f954498e54c850773e9ba13eea",
+      "size": 1063
+    },
+    {
+      "path": "scripts/vite/sites-vite-plugin.ts",
+      "sha": "2ece1b96530b40a7ea4981e6341b52771a07813e",
+      "size": 7185
+    },
+    {
+      "path": "tests/arena_flow.mjs",
+      "sha": "f0c53f73ec9a8c2da870e44cfc3cb15a1f52c3d0",
+      "size": 78643
+    },
+    {
+      "path": "tests/contest_rules.py",
+      "sha": "8edda833af4139b64f7389fe97574fce2b0cbac7",
+      "size": 6240
+    },
+    {
+      "path": "tests/photo-upload.mjs",
+      "sha": "9cd2c1401ce541de80cf9619ee0a9fda24c54acd",
+      "size": 7376
+    },
+    {
+      "path": "tests/pwa.test.mjs",
+      "sha": "e4da5dca27ada7e36a05cb4ae6c0982a42cb2330",
+      "size": 5143
+    },
+    {
+      "path": "tests/submission-deadline.test.mjs",
+      "sha": "213a6b7a219117edeb5daee00ea3dea6ea9f4094",
+      "size": 1098
+    },
+    {
+      "path": "tests/ui-actions.mjs",
+      "sha": "1a4a30a695cbcff3438efd6233eeae1eeeb37799",
+      "size": 38224
+    },
+    {
+      "path": "tests/upload-page.mjs",
+      "sha": "2872493b9ef07eb535214ee556172302177bc393",
+      "size": 10282
+    },
+    {
+      "path": "tsconfig.json",
+      "sha": "b96b030395279e33ceb96d41da84e734b5a93078",
+      "size": 893
+    },
+    {
+      "path": "vendor/shadcn-tailwind-4.13.0.LICENSE.md",
+      "sha": "fad4d887a681dd49233e5ed01ee2c7a1513089a0",
+      "size": 1063
+    },
+    {
+      "path": "vendor/shadcn-tailwind-4.13.0.css",
+      "sha": "7807c58eb94de8b764b9b6b7b5d8cde6d012b17f",
+      "size": 16041
+    },
+    {
+      "path": "vite.config.ts",
+      "sha": "c4b4b73f5d91840732a55c776eb601215e0b7b38",
+      "size": 2673
+    },
+    {
+      "path": "worker/index.ts",
+      "sha": "f72ddaf88049e3359a20c50d2d692925895543e0",
+      "size": 1303
+    }
+  ],
+  "standalone_adaptations": [
+    {
+      "path": "web/.gitignore",
+      "source_sha": "0ef03ed1ae8b17716270e6ba7d6b628b66eaceb1",
+      "export_sha": "fd755fd373c92092ab16767b6d0bb1421993ae7f"
+    },
+    {
+      "path": "web/.openai/hosting.json",
+      "source_sha": "4db975dc352eac0040e5b9e2ea2df415816d120a",
+      "export_sha": "00cf4ed7abd7294f3305bf61ae05dcff37b592e8"
+    },
+    {
+      "path": "web/app/api/[...action]/route.ts",
+      "source_sha": "b1fa3b698d8a4fe8c03d4fd150ee153b263692f1",
+      "export_sha": "c25da2e6d9ac72db692c8d28209ddc609942102b"
+    },
+    {
+      "path": "web/app/welcome.tsx",
+      "source_sha": "dc8044c7bc16d81b4847d2522d54c1b724e98113",
+      "export_sha": "94e2f05546ec10a9d84f3b3ae00feb55a888d295"
+    },
+    {
+      "path": "web/db/schema.ts",
+      "source_sha": "5d5693a7f59ac01c944fed0400aa5f62eff02610",
+      "export_sha": "a6121bd6c066826c4733ebbae221dbe62be30ba4"
+    },
+    {
+      "path": "web/drizzle/0002_striped_mandrill.sql",
+      "source_sha": "1ed4ff9b4f531775cca7261597ed6eb0726e2b6e",
+      "export_sha": "8c20c83bf67a8fc91f69313f6c00640e9a9b16c7"
+    },
+    {
+      "path": "web/drizzle/0004_burly_senator_kelly.sql",
+      "source_sha": "cb1b99fde23bc3113aafa7ae028ac9f8344d2bb7",
+      "export_sha": "ce58135ed71e726587130f270e4e51d816519763"
+    },
+    {
+      "path": "web/drizzle/meta/_journal.json",
+      "source_sha": "d80b6430b20faaeb430188efea95f2404f11ec9e",
+      "export_sha": "d9ff7ee467488395f783d4f3103d80a65fc8159c"
+    },
+    {
+      "path": "web/lib/access.ts",
+      "source_sha": "0176ce18a1138ec183a7c41a07a16b77682b0d6d",
+      "export_sha": "8944d60173a18499534bbfe2c1e8adc880656a03"
+    },
+    {
+      "path": "web/lib/auth.ts",
+      "source_sha": "b24c6c2f095065ac8c082e8018d84c940fa22556",
+      "export_sha": "8d2b2f6f49899649568a8dab3a243d6558b1b1f1"
+    },
+    {
+      "path": "web/lib/commerce.ts",
+      "source_sha": "4a0a63102eef1c45f71864d8f148879e8626ba96",
+      "export_sha": "655de5baec0ff35f8060188607572c376671d5d4"
+    },
+    {
+      "path": "web/lib/sponsorship.ts",
+      "source_sha": "df7215fec00735d1c96ed3d10240ca15d4945adc",
+      "export_sha": "c914e1ddef3ae3c4dc5f7be69b9b786a3ef77621"
+    },
+    {
+      "path": "web/lib/trophies.ts",
+      "source_sha": "ca1042ea7a932f3b4f373247e4be629bdfa51703",
+      "export_sha": "1769752b9fa3d1e122cb46a34e752ff9a438a8f2"
+    },
+    {
+      "path": "web/lib/worker.ts",
+      "source_sha": "1de8f7c366365a6db804a54b285b957c6c240666",
+      "export_sha": "ec1c9a29bbebcbae151e6129bb67729bfd905f5c"
+    },
+    {
+      "path": "web/package-lock.json",
+      "source_sha": "b167c1df0ad2d0b3d22144ac6d172994fbb0d673",
+      "export_sha": "a7d8f531c2080084d05804ece26c1746967e8ffa"
+    },
+    {
+      "path": "web/package.json",
+      "source_sha": "454a1aac06163b4a3319e078d670b869a23be12f",
+      "export_sha": "de5a3002b2b4c0f28b80f38dd22ffb9c179bc0f1"
+    },
+    {
+      "path": "web/tests/arena_flow.mjs",
+      "source_sha": "f0c53f73ec9a8c2da870e44cfc3cb15a1f52c3d0",
+      "export_sha": "5d6c5eb473ae41b1043c74fcd0c986ffc894268d"
+    }
+  ],
+  "preserved_client_roots": [
+    "android",
+    "ios",
+    "desktop",
+    "macos",
+    "windows",
+    "config",
+    "downloads"
+  ],
+  "validation": "See SITE_SYNC_RU.md"
+}

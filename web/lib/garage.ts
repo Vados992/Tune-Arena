@@ -16,7 +16,7 @@ export const workshop: Photo[] = [
     source:commons+"The_tire_wheel_of_Toyota_86_(ZN6)_with_TRD_parts.JPG",license:"CC0 1.0",terms:cc0},
 ];
 export const garagePhoto=(media:string)=>media.startsWith("sample:")?sampleGarage[media.slice(7)]:undefined;
-export const frames = ["neon","carbon","nitro","chrome","gold","flame"] as const;
+export const frames = ["plain","gold","neon","carbon","nitro","chrome","flame"] as const;
 export const frameTitles:Record<typeof frames[number],string> = {
-  neon:"Neon Circuit",carbon:"Carbon Weave",nitro:"Nitro Blue",chrome:"Chrome Lip",gold:"Gold Edition",flame:"Flame Spec",
+  plain:"Default",neon:"Neon Circuit",carbon:"Carbon Weave",nitro:"Nitro Blue",chrome:"Chrome Lip",gold:"Gold Edition",flame:"Flame Spec",
 };

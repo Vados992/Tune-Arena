@@ -11,7 +11,7 @@ export async function api<T=Record<string,unknown>>(path:string,method="GET",bod
 }
 export function errorLabel(error:unknown):Text {
   const messages:Record<string,Text>={
-    closed:"finished",invalid_image:"imageError",entry_exists:"duplicate",provider_unavailable:"unconfigured",
+    submissions_closed:"submissionsClosed",invalid_deadline:"invalidDeadline",entry_replaced:"entryChanged",motor_spent:"motorSpent",own_entry:"mine",closed:"finished",invalid_image:"imageError",entry_exists:"duplicate",provider_unavailable:"unconfigured",
     sign_in:"loginText",nickname_required:"nicknameMissing",nickname_taken:"nicknameTaken",
     invalid_nickname:"nicknameHint",rate_limited:"requestLimit",winner_not_ready:"notReady",premium_required:"framesLock",
   };
