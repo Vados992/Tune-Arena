@@ -44,7 +44,7 @@ jobs:
       - run: npm --prefix desktop audit --audit-level=high
       - run: npm --prefix desktop test
       - run: npm --prefix desktop run ${{ matrix.command }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Tune-Arena-${{ matrix.platform }}-test-installers
           path: |
@@ -75,7 +75,7 @@ jobs:
       - working-directory: android
         run: ./gradlew --no-daemon assembleDebug bundleRelease lint
       - run: node scripts/check-projects.mjs
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Tune-Arena-Android-debug-APK-and-unsigned-AAB
           path: |
@@ -95,7 +95,7 @@ jobs:
       - run: xcodebuild -project ios/TuneArena.xcodeproj -scheme TuneArena -configuration Release -destination 'generic/platform=iOS' -archivePath outputs/TuneArena.xcarchive CODE_SIGNING_ALLOWED=NO archive
       - run: ditto -c -k --sequesterRsrc --keepParent 'outputs/ios-simulator/Build/Products/Debug-iphonesimulator/Tune Arena.app' outputs/TuneArena-iOS-Simulator.zip
       - run: ditto -c -k --sequesterRsrc --keepParent outputs/TuneArena.xcarchive outputs/TuneArena-iOS-unsigned-archive.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: Tune-Arena-iOS-simulator-and-unsigned-archive
           path: outputs/*.zip
