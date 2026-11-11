@@ -8,6 +8,10 @@
     "node": ">=24"
   },
   "scripts": {
+    "build": "npm run build:cloudflare",
+    "build:cloudflare": "node scripts/cloudflare.mjs build",
+    "deploy": "npm run deploy:cloudflare",
+    "deploy:cloudflare": "node scripts/cloudflare.mjs deploy",
     "setup": "npm --prefix web ci && npm --prefix web run local:setup",
     "dev": "npm --prefix web run dev",
     "test": "node scripts/check.mjs",

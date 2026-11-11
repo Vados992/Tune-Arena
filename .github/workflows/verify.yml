@@ -25,7 +25,16 @@ jobs:
       - run: npm --prefix web ci
       - run: npm --prefix web audit --audit-level=high
       - run: npm test
-      - run: npm --prefix web run build
+      - name: Build production Worker from the repository root
+        run: npm run build:cloudflare
+        env: &cloudflare-test-settings
+          TUNE_D1_DATABASE_ID: '11111111-1111-4111-8111-111111111111'
+          TUNE_R2_BUCKET_NAME: tune-arena-ci
+          TUNE_APP_ORIGIN: https://tune-arena.invalid
+          TUNE_WORKER_NAME: tune-arena-ci
+      - name: Validate production Worker upload without publishing
+        run: npm run deploy:cloudflare -- --dry-run
+        env: *cloudflare-test-settings
       - run: npm --prefix web run db:local
       - run: npm --prefix web run db:local
       - run: node scripts/check-projects.mjs

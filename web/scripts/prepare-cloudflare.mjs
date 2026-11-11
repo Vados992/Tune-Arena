@@ -1,15 +1,19 @@
-import {administratorTelegramIds} from '../lib/telegram-init-data.mjs';
-import {readFileSync,writeFileSync}from "node:fs";
-import path from "node:path";
-const id=process.env.TUNE_D1_DATABASE_ID,bucket=process.env.TUNE_R2_BUCKET_NAME,appUrl=process.env.TUNE_APP_ORIGIN;
-if(!/^[a-f0-9-]{36}$/i.test(id??"")||!bucket||!appUrl)throw new Error("Set TUNE_D1_DATABASE_ID, TUNE_R2_BUCKET_NAME and TUNE_APP_ORIGIN; see docs/DEPLOYMENT_RU.md");
-const u=new URL(appUrl);if(u.protocol!=="https:"||u.username||u.password||u.search||u.hash||!["/", ""].includes(u.pathname))throw new Error("TUNE_APP_ORIGIN must be an HTTPS origin");
-if((process.env.TUNE_ADMIN_TELEGRAM_IDS||process.env.TUNE_ADMIN_TELEGRAM_ID)&&!administratorTelegramIds(process.env.TUNE_ADMIN_TELEGRAM_IDS,process.env.TUNE_ADMIN_TELEGRAM_ID).length)throw new Error('Invalid administrator Telegram ID allowlist.');
-const config=JSON.parse(readFileSync("dist/server/wrangler.json","utf8"));
-config.name=process.env.TUNE_WORKER_NAME??"tune-arena";
-config.d1_databases=[{binding:"DB",database_name:"tune-arena",database_id:id,migrations_dir:path.resolve("drizzle")}];
-config.r2_buckets=[{binding:"BUCKET",bucket_name:bucket}];
-config.vars={ENVIRONMENT:"production",TRUST_SITE_AUTH:"0",APP_ORIGIN:u.origin,...(process.env.TUNE_ADMIN_TELEGRAM_ID?{TUNE_ADMIN_TELEGRAM_ID:process.env.TUNE_ADMIN_TELEGRAM_ID}:{})};
-if(process.env.TUNE_ADMIN_TELEGRAM_IDS)config.vars.TUNE_ADMIN_TELEGRAM_IDS=process.env.TUNE_ADMIN_TELEGRAM_IDS;
-writeFileSync("dist/server/wrangler.deploy.json",JSON.stringify(config,null,2));
-console.log("Prepared standalone production Worker configuration; development sign-in is disabled.");
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import { productionConfig, deploymentSettings } from './cloudflare-config.mjs';
+
+const web = fileURLToPath(new URL('../', import.meta.url));
+deploymentSettings(process.env);
+const configPath = path.join(web, 'dist/server/wrangler.deploy.json');
+const base = JSON.parse(readFileSync(path.join(web, 'dist/server/wrangler.json'), 'utf8'));
+const config = productionConfig(base, process.env, path.join(web, 'drizzle'));
+writeFileSync(configPath, JSON.stringify(config, null, 2));
+// Wrangler must find the production server from either the repository root or web/.
+// Never redirect a production deploy to the local preview D1/R2 configuration.
+for (const directory of [web, path.dirname(web)]) {
+  const target = path.join(directory, '.wrangler/deploy/config.json');
+  mkdirSync(path.dirname(target), { recursive: true });
+  writeFileSync(target, JSON.stringify({ configPath: path.relative(path.dirname(target), configPath).split(path.sep).join('/') }));
+}
+console.log('Prepared standalone production Worker configuration and root/web Wrangler redirects; development sign-in is disabled.');
