@@ -4,7 +4,7 @@
  * Run from the project root with: node tests/arena_flow.mjs
  */
 import assert from "node:assert/strict";
-import {createHash} from "node:crypto";
+import {createHmac,createHash} from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
 import { DatabaseSync } from "node:sqlite";
 import { build } from "esbuild";
@@ -1066,4 +1066,54 @@ assert.equal((await request('state','GET',undefined,{Cookie:demoCookie})).data.s
 assert.equal((await request('admin/access','GET',undefined,{Cookie:demoCookie})).status,401);
 console.log('PASS: standalone rejects spoofed platform identity, production disables demo and removed providers, localhost-only login, verified Telegram administrator, wrong-ID denial and deletion revokes administration.');
 
+{
+// Mini App sessions: production routes, real HMAC, fixture D1 transactions.
+const miniEnv=globalThis.__tuneArenaFixture.env;
+miniEnv.TELEGRAM_BOT_TOKEN='123456:fixture-mini-bot-token';
+miniEnv.TUNE_ADMIN_TELEGRAM_IDS='314159,271828';delete miniEnv.TUNE_ADMIN_TELEGRAM_ID;
+seconds=Math.floor(Date.now()/1000);viewer=null;
+let launchCounter=0;
+function miniLaunch(id=314159,issued=Math.floor(Date.now()/1000)){
+ const p=new URLSearchParams({auth_date:String(issued),user:JSON.stringify({id,first_name:'Fixture',admin:true}),query_id:'mini-'+(++launchCounter)});
+ const data=[...p].sort(([a],[b])=>a<b?-1:a>b?1:0).map(([k,v])=>k+'='+v).join('\n');
+ const key=createHmac('sha256','WebAppData').update(miniEnv.TELEGRAM_BOT_TOKEN).digest();
+ p.set('hash',createHmac('sha256',key).update(data).digest('hex'));return p.toString();
+}
+const miniLogin=(raw,cookie='')=>request('auth/telegram/mini','POST',{initData:raw},{Cookie:cookie});
+assert.equal((await miniLogin(miniLaunch().replace('Fixture','Tampered'))).status,401);
+assert.equal((await miniLogin(miniLaunch(314159,Math.floor(Date.now()/1000)-301))).status,401);
+assert.equal((await request('auth/telegram/mini','POST',{initData:miniLaunch()},{Origin:'https://foreign.invalid'})).status,403);
+const launch=miniLaunch();const signedMini=await miniLogin(launch);assert.equal(signedMini.status,200);assert.equal(signedMini.data.changed,true);
+assert(signedMini.cookie.includes('HttpOnly'));assert(signedMini.cookie.includes('Secure'));
+const miniCookie=signedMini.cookie.split(';')[0];
+assert.equal((await request('state','GET',undefined,{Cookie:miniCookie})).data.admin,true);
+assert.equal((await miniLogin(launch,miniCookie)).data.changed,false);
+assert.equal((await miniLogin(launch)).status,401); // replay from another browser
+assert.equal((await miniLogin(miniLaunch(314159,Math.floor(Date.now()/1000)-301),miniCookie)).data.changed,false); // existing valid session survives launch expiry
+const miniSubject=createHash('sha256').update('telegram:314159').digest('base64url');
+const firstMiniUser=sql.prepare("SELECT user_id FROM identities WHERE provider='telegram' AND subject=?").get(miniSubject).user_id;
+const other=await miniLogin(miniLaunch(271828),miniCookie);assert.equal(other.status,200);
+const otherCookie=other.cookie.split(';')[0];
+assert.equal((await request('state','GET',undefined,{Cookie:otherCookie})).data.admin,true);
+assert.equal((await request('state','GET',undefined,{Cookie:miniCookie})).data.signedIn,false);
+assert.equal(sql.prepare("SELECT user_id FROM identities WHERE provider='telegram' AND subject=?").get(miniSubject).user_id,firstMiniUser); // no implicit linking
+const ordinary=await miniLogin(miniLaunch(161803));const ordinaryCookie=ordinary.cookie.split(';')[0];
+assert.equal((await request('state','GET',undefined,{Cookie:ordinaryCookie})).data.admin,false);
+assert.equal((await request('admin/access','GET',undefined,{Cookie:ordinaryCookie})).status,403);
+assert.equal((await miniLogin('x'.repeat(21000))).status,413);
+const concurrent=miniLaunch(141421);
+assert.deepEqual((await Promise.all([miniLogin(concurrent),miniLogin(concurrent)])).map(r=>r.status).sort(),[200,401]);
+const rollbackLaunch=miniLaunch(173205);
+sql.exec("CREATE TRIGGER mini_fixture_failure BEFORE INSERT ON sessions BEGIN SELECT RAISE(ABORT,'fixture_mini_failure'); END;");
+assert.equal((await miniLogin(rollbackLaunch)).status,500);
+sql.exec('DROP TRIGGER mini_fixture_failure');
+assert.equal((await miniLogin(rollbackLaunch)).status,200); // marker and identity rolled back with session
+assert.equal((await request('account','DELETE',{confirmation:'DELETE'},{Cookie:otherCookie})).status,200);
+assert.equal((await request('admin/access','GET',undefined,{Cookie:otherCookie})).status,401);
+const reused=await miniLogin(launch,otherCookie);assert.equal(reused.status,401);
+delete miniEnv.TELEGRAM_BOT_TOKEN;
+assert.equal((await miniLogin('unconfigured')).status,503);
+console.log('PASS: Mini App HMAC sessions, CSRF, launch expiry, existing-session continuity, cross-browser replay rejection, concurrent launch consumption, atomic rollback, separate identities, multiple verified administrators, participant denial and deletion revocation.');
+
+}
 sql.close();

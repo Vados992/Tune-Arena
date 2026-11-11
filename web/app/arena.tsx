@@ -50,6 +50,7 @@ export default function Arena({initialLanguage}:{initialLanguage:Locale}) {
   const [garageRefresh,setGarageRefresh]=useState(0);
   const garageActive=tab==="profile"||modal==="frames"||modal==="premium";
   const modalOpen=!!modal;
+  useEffect(()=>{const back=()=>{setModal(null);setTab("feed");};window.addEventListener('tune-arena-back',back);return()=>window.removeEventListener('tune-arena-back',back);},[]);
   useEffect(()=>{
     if(!modalOpen)return;
     const trigger=document.activeElement as HTMLElement|null,overflow=document.body.style.overflow;

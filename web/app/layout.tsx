@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import TelegramRuntime from "./telegram-runtime";
 import PwaRuntime from "./pwa-runtime";
 import "./globals.css";
 
@@ -13,5 +14,5 @@ export const metadata: Metadata = {
 };
 export const viewport: Viewport = { width: "device-width", initialScale: 1, themeColor: "#0d0f13" };
 export default function RootLayout({children}:{children:React.ReactNode}) {
-  return <html lang="en"><body><PwaRuntime/>{children}</body></html>;
+  return <html lang="en"><head><script src="https://telegram.org/js/telegram-web-app.js"/></head><body><PwaRuntime/><TelegramRuntime>{children}</TelegramRuntime></body></html>;
 }

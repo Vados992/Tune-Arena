@@ -1,3 +1,4 @@
+import {miniAppSignIn} from './mini-app-auth';
 import { config, db, token, digest, now, origin, cookie, cookieHeader, failure, json, redirectTo, currentUser, localDevelopment } from "./worker";
 
 const telegram = "https://oauth.telegram.org";
@@ -99,6 +100,7 @@ async function telegramCallback(req: Request) {
 }
 
 export async function authRoute(req: Request, path: string) {
+  if(req.method==="POST"&&path==="auth/telegram/mini")return miniAppSignIn(req);
   if(req.method==="POST"&&path==="auth/dev") {
     if(!localDevelopment(req))return failure("not_found",404);
     return signIn(req,"dev","local-driver");

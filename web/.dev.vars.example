@@ -7,3 +7,7 @@ LOCAL_DEV_ADMIN="1"
 # TUNE_ADMIN_TELEGRAM_ID=""
 # TELEGRAM_CLIENT_ID=""
 # TELEGRAM_CLIENT_SECRET=""
+
+# Store the real bot token only in local ignored .dev.vars / Worker secrets.
+# TELEGRAM_BOT_TOKEN=""
+# TUNE_ADMIN_TELEGRAM_IDS="123456789,987654321"

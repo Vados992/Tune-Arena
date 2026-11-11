@@ -1,8 +1,10 @@
+import {administratorTelegramIds} from './telegram-init-data.mjs';
 import { env } from "cloudflare:workers";
 import { getChatGPTUser } from "@/app/chatgpt-auth";
 
 type Config = {
   DB: D1Database; BUCKET: R2Bucket; APP_ORIGIN?: string;
+  TELEGRAM_BOT_TOKEN?:string; TUNE_ADMIN_TELEGRAM_IDS?:string;
   TELEGRAM_CLIENT_ID?: string; TELEGRAM_CLIENT_SECRET?: string;
   TUNE_ADMIN_EMAIL?: string; TUNE_ADMIN_TELEGRAM_ID?: string;
   TRUST_SITE_AUTH?:string; ENVIRONMENT?:string; LOCAL_DEV_AUTH?:string; LOCAL_DEV_ADMIN?:string;
@@ -59,7 +61,8 @@ export async function isAdministrator(userId?:string|null) {
   }
   if(!userId||await db().prepare("SELECT user_id FROM deleted_accounts WHERE user_id=?").bind(userId).first())return false;
   if(localDevelopment()&&config.LOCAL_DEV_ADMIN==="1"&&await db().prepare("SELECT user_id FROM identities WHERE provider='dev' AND subject=? AND user_id=?").bind(await digest("dev:local-driver"),userId).first())return true;
-  const expected=config.TUNE_ADMIN_TELEGRAM_ID?.trim();
-  if(!/^[1-9][0-9]{0,19}$/.test(expected??""))return false;
-  return !!await db().prepare("SELECT user_id FROM identities WHERE provider='telegram' AND subject=? AND user_id=?").bind(await digest("telegram:"+expected),userId).first();
+  for(const id of administratorTelegramIds(config.TUNE_ADMIN_TELEGRAM_IDS,config.TUNE_ADMIN_TELEGRAM_ID)) {
+    if(await db().prepare("SELECT user_id FROM identities WHERE provider='telegram' AND subject=? AND user_id=?").bind(await digest("telegram:"+id),userId).first())return true;
+  }
+  return false;
 }

@@ -12,7 +12,7 @@
     "start": "node --import ./scripts/sites-env.mjs ./node_modules/wrangler/bin/wrangler.js dev --config dist/server/wrangler.json --local --persist-to .wrangler/state --ip 127.0.0.1 --inspector-port 0",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
-    "test": "node tests/migration-upgrade.mjs && node tests/arena_flow.mjs && python3 tests/contest_rules.py && node --test tests/pwa.test.mjs tests/submission-deadline.test.mjs && node scripts/check-trophy-contract.mjs && node tests/ui-actions.mjs && node tests/photo-upload.mjs && node tests/upload-page.mjs",
+    "test": "node --test tests/telegram-mini.test.mjs && node tests/migration-upgrade.mjs && node tests/arena_flow.mjs && python3 tests/contest_rules.py && node --test tests/pwa.test.mjs tests/submission-deadline.test.mjs && node scripts/check-trophy-contract.mjs && node tests/telegram-runtime.test.mjs && node tests/ui-actions.mjs && node tests/photo-upload.mjs && node tests/upload-page.mjs",
     "contracts:build": "node scripts/check-trophy-contract.mjs",
     "local:setup": "node scripts/setup-local.mjs",
     "db:local": "node scripts/migrate-local.mjs",
