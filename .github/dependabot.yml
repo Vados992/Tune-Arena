@@ -1,0 +1,40 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /web
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      web-framework:
+        patterns:
+          - react
+          - react-dom
+          - react-server-dom-webpack
+          - '@types/react*'
+          - next
+          - eslint-config-next
+          - vinext
+          - vite
+          - '@vitejs/plugin-*'
+      cloudflare-tools:
+        patterns:
+          - '@cloudflare/*'
+          - wrangler
+      web-security:
+        applies-to: security-updates
+        patterns: ['*']
+  - package-ecosystem: npm
+    directory: /desktop
+    schedule:
+      interval: weekly
+    groups:
+      desktop-packaging:
+        patterns: [electron, electron-builder]
+      desktop-security:
+        applies-to: security-updates
+        patterns: ['*']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

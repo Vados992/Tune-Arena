@@ -23,6 +23,7 @@ jobs:
         with:
           python-version: '3.12'
       - run: npm --prefix web ci
+      - run: npm --prefix web audit --audit-level=high
       - run: npm test
       - run: npm --prefix web run build
       - run: npm --prefix web run db:local

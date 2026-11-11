@@ -69,7 +69,7 @@ npm run configure -- https://your-app.example
 
 GitHub Actions: [проверки](.github/workflows/verify.yml) и [четыре платформенные сборки](.github/workflows/build-clients.yml). Вторая workflow создаёт тестовые macOS/Windows-пакеты без сертификатов, Android debug APK и unsigned AAB, iOS simulator app и unsigned device archive. Она не публикует приложение в магазины и не создаёт подписанный IPA без Apple Developer credentials.
 
-Первый облачный запуск 7 ноября остановился до выполнения шагов всех заданий; macOS/Windows/iOS-сборки пока не подтверждены. [Фактические результаты](docs/VERIFICATION.md). Android APK собран отдельно и доступен выше.
+11 ноября реальные Actions успешно выполнили web-проверки и сборки macOS/Windows/iOS. Android останавливался на отсутствующем `sdkmanager`; исправленный workflow требует нового запуска. [Фактические результаты и инструкция запуска](docs/DEPENDENCY_UPDATES_RU.md). Android APK из отдельной прежней сборки доступен выше.
 
 ## Система и эксплуатация
 
@@ -95,3 +95,7 @@ node scripts/check-projects.mjs
 ## Telegram Mini App
 
 Добавлены проверенный сервером вход по Mini App `initData`, защита от повторного использования запуска, клиентский Telegram runtime с кнопкой «Назад» и несколько владельцев по `TUNE_ADMIN_TELEGRAM_IDS`. [Публикация, бот и фактические ограничения проверки](docs/TELEGRAM_MINI_APP_RU.md).
+
+## Обновления и GitHub Actions
+
+Исправлены конфликт npm peer dependencies в обновлении React/RSC и установка Android SDK в CI. Связанные обновления сгруппированы в Dependabot; ручная сборка клиентов поддерживает выбор платформы. [Проверенные версии, результаты и инструкция запуска для q5hjdh792d-collab](docs/DEPENDENCY_UPDATES_RU.md).
