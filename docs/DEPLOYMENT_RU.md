@@ -2,7 +2,7 @@
 
 Нужны аккаунт Cloudflare, D1, R2 и настроенный Telegram OIDC. Платформенные клиенты используют адрес вашего общего HTTPS-сервера. Эти ресурсы и провайдеры не создаются установкой клиента.
 
-При подключении GitHub через Cloudflare Dashboard использовать [настройки Workers Builds из корня репозитория](CLOUDFLARE_BUILDS_RU.md): Build command `npm run build:cloudflare`, Deploy command `npm run deploy:cloudflare`. Пустой Build command и прямой `npx wrangler deploy` из несобранного корня вызывают ошибку обнаружения статических файлов.
+Для автоматического создания D1/R2 при публикации без GitHub Actions использовать [настройки Workers Builds из корня репозитория](CLOUDFLARE_BUILDS_RU.md): Build command `npm run build:cloudflare`, Deploy command `npm run deploy:cloudflare`. Пустой Build command и прямой `npx wrangler deploy` из несобранного корня вызывают ошибку обнаружения статических файлов.
 
 ## 1. Собрать web
 

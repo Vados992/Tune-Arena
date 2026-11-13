@@ -98,6 +98,6 @@ node scripts/check-projects.mjs
 
 ## Обновления и GitHub Actions
 
-Для публикации в Cloudflare Workers Builds: Root directory `/`, Build command `npm run build:cloudflare`, Deploy command `npm run deploy:cloudflare`. [Обязательные переменные, D1/R2 и исправление ошибки обнаружения статических файлов](docs/CLOUDFLARE_BUILDS_RU.md).
+Для публикации в Cloudflare Workers Builds: Root directory `/`, Build command `npm run build:cloudflare`, Deploy command `npm run deploy:cloudflare`. [Автоматическое создание D1/R2 в Cloudflare Builds и исправление ошибок публикации](docs/CLOUDFLARE_BUILDS_RU.md).
 
 Исправлены конфликт npm peer dependencies в обновлении React/RSC и установка Android SDK в CI. Связанные обновления сгруппированы в Dependabot; ручная сборка клиентов поддерживает выбор платформы. [Проверенные версии, результаты и инструкция запуска для q5hjdh792d-collab](docs/DEPENDENCY_UPDATES_RU.md).

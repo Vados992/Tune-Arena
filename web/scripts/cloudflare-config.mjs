@@ -1,5 +1,9 @@
 import { administratorTelegramIds } from '../lib/telegram-init-data.mjs';
 
+export function deploymentWorkerName(env) {
+  return env.WRANGLER_CI_OVERRIDE_NAME || env.TUNE_WORKER_NAME || 'tune-arena';
+}
+
 export function deploymentSettings(env) {
   const required = ['TUNE_D1_DATABASE_ID', 'TUNE_R2_BUCKET_NAME', 'TUNE_APP_ORIGIN'];
   const missing = required.filter(key => !env[key]);
@@ -18,7 +22,7 @@ export function deploymentSettings(env) {
       !administratorTelegramIds(env.TUNE_ADMIN_TELEGRAM_IDS, env.TUNE_ADMIN_TELEGRAM_ID).length) {
     throw new Error('Invalid administrator Telegram ID allowlist.');
   }
-  return { id, bucket: env.TUNE_R2_BUCKET_NAME, origin: url.origin, name: env.TUNE_WORKER_NAME || 'tune-arena' };
+  return { id, bucket: env.TUNE_R2_BUCKET_NAME, origin: url.origin, name: deploymentWorkerName(env) };
 }
 
 export function productionConfig(base, env, migrationsDir) {
@@ -26,8 +30,8 @@ export function productionConfig(base, env, migrationsDir) {
   return {
     ...base,
     name: settings.name,
-    d1_databases: [{ binding: 'DB', database_name: 'tune-arena', database_id: settings.id, migrations_dir: migrationsDir }],
-    r2_buckets: [{ binding: 'BUCKET', bucket_name: settings.bucket }],
+    d1_databases: [{ binding: 'DB', database_name: env.TUNE_D1_DATABASE_NAME || settings.name, database_id: settings.id, migrations_dir: migrationsDir }],
+    r2_buckets: [{ binding: 'BUCKET', bucket_name: settings.bucket, ...(env.TUNE_R2_JURISDICTION ? { jurisdiction: env.TUNE_R2_JURISDICTION } : {}) }],
     vars: {
       ENVIRONMENT: 'production', TRUST_SITE_AUTH: '0', APP_ORIGIN: settings.origin,
       ...(env.TUNE_ADMIN_TELEGRAM_ID ? { TUNE_ADMIN_TELEGRAM_ID: env.TUNE_ADMIN_TELEGRAM_ID } : {}),

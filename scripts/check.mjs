@@ -1,3 +1,3 @@
 import {spawnSync} from "node:child_process";
-const commands=[[".",process.execPath,["--test","scripts/tests/cloudflare-config.test.mjs"]],["web",process.execPath,["node_modules/typescript/bin/tsc","--noEmit"]],["web",process.platform==="win32"?"npm.cmd":"npm",["test"]],["desktop",process.execPath,["--test","tests/policy.test.cjs"]]];
+const commands=[[".",process.execPath,["--test","scripts/tests/cloudflare-config.test.mjs","scripts/tests/cloudflare-resources.test.mjs"]],["web",process.execPath,["node_modules/typescript/bin/tsc","--noEmit"]],["web",process.platform==="win32"?"npm.cmd":"npm",["test"]],["desktop",process.execPath,["--test","tests/policy.test.cjs"]]];
 for(const [cwd,command,args]of commands){const r=spawnSync(command,args,{cwd,stdio:"inherit",shell:process.platform==="win32"&&command==="npm.cmd"});if(r.error)throw r.error;if(r.status!==0)process.exit(r.status??1);}

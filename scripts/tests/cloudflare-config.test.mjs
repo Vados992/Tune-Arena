@@ -25,7 +25,7 @@ test('production config replaces preview bindings and strips development variabl
   assert.equal(config.main, 'index.js');
   assert.deepEqual(config.assets, base.assets);
   assert.equal(config.no_bundle, true);
-  assert.deepEqual(config.d1_databases, [{ binding: 'DB', database_name: 'tune-arena', database_id: settings.TUNE_D1_DATABASE_ID, migrations_dir: '/project/web/drizzle' }]);
+  assert.deepEqual(config.d1_databases, [{ binding: 'DB', database_name: 'existing-worker', database_id: settings.TUNE_D1_DATABASE_ID, migrations_dir: '/project/web/drizzle' }]);
   assert.deepEqual(config.r2_buckets, [{ binding: 'BUCKET', bucket_name: settings.TUNE_R2_BUCKET_NAME }]);
   assert.deepEqual(config.vars, { ENVIRONMENT: 'production', TRUST_SITE_AUTH: '0', APP_ORIGIN: settings.TUNE_APP_ORIGIN, TUNE_ADMIN_TELEGRAM_IDS: '123456789,987654321' });
   assert.equal(JSON.stringify(config).includes('do-not-copy'), false);
