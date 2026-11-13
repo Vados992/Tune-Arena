@@ -1,10 +1,13 @@
 import { administratorTelegramIds } from '../lib/telegram-init-data.mjs';
 import { deploymentSettings, deploymentWorkerName } from './cloudflare-config.mjs';
+import { deploymentAccount, assertProductionBranch } from './cloudflare-target.mjs';
 
 // Uses the token already provided to the Cloudflare build. No credentials are
 // persisted in the repository, generated config, or log messages.
 export async function resolveDeploymentEnvironment(input, fetcher = fetch, log = console.log) {
-  const env = { ...input };
+  deploymentAccount(input);
+  assertProductionBranch(input);
+  const env = { ...input, CLOUDFLARE_ACCOUNT_ID: deploymentAccount(input) };
   const required = ['TUNE_D1_DATABASE_ID', 'TUNE_R2_BUCKET_NAME', 'TUNE_APP_ORIGIN'];
   if (required.every(key => env[key])) {
     deploymentSettings(env);

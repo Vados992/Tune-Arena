@@ -4,7 +4,7 @@ import { resolveDeploymentEnvironment } from '../../web/scripts/cloudflare-resou
 import { productionConfig } from '../../web/scripts/cloudflare-config.mjs';
 
 const ID = '11111111-1111-4111-8111-111111111111';
-const account = 'a'.repeat(32);
+const account = '4e7eef5f6d0569a85b19cb78279e5aed';
 const secret = 'test-only-never-log-this-value';
 const auth = { CLOUDFLARE_ACCOUNT_ID: account, CLOUDFLARE_API_TOKEN: secret, TUNE_WORKER_NAME: 'tune-arena' };
 const manual = { TUNE_D1_DATABASE_ID: ID, TUNE_R2_BUCKET_NAME: 'existing-photos', TUNE_APP_ORIGIN: 'https://arena.example' };
@@ -59,6 +59,12 @@ test('first deployment creates D1/R2; retries reuse them without deletes or dupl
   assert.equal(server.calls.filter(call => call.method === 'POST').length, 2);
   assert.equal(server.calls.some(call => call.method === 'DELETE'), false);
   assert.equal(logs.join(' ').includes(secret), false);
+});
+test('configured target account is used when the build does not inject an account variable', async () => {
+  const server = cloud({ databases: [{ name: 'tune-arena', uuid: ID }], bucketExists: true });
+  const result = await resolveDeploymentEnvironment({ CLOUDFLARE_API_TOKEN: secret }, server.fetcher, () => {});
+  assert.equal(result.CLOUDFLARE_ACCOUNT_ID, account);
+  assert.equal(server.calls.some(call => call.method === 'POST'), false);
 });
 test('existing Worker storage, custom origin and owner allowlist are retained', async () => {
   const server = cloud({ bindings: [

@@ -1,10 +1,12 @@
 import { administratorTelegramIds } from '../lib/telegram-init-data.mjs';
+import { cloudflareTarget, deploymentAccount, assertProductionBranch } from './cloudflare-target.mjs';
 
 export function deploymentWorkerName(env) {
-  return env.WRANGLER_CI_OVERRIDE_NAME || env.TUNE_WORKER_NAME || 'tune-arena';
+  return env.WRANGLER_CI_OVERRIDE_NAME || env.TUNE_WORKER_NAME || cloudflareTarget.worker_name;
 }
 
 export function deploymentSettings(env) {
+  deploymentAccount(env);
   const required = ['TUNE_D1_DATABASE_ID', 'TUNE_R2_BUCKET_NAME', 'TUNE_APP_ORIGIN'];
   const missing = required.filter(key => !env[key]);
   if (missing.length) throw new Error(`Set Cloudflare build variables: ${missing.join(', ')}. See docs/CLOUDFLARE_BUILDS_RU.md.`);
@@ -26,9 +28,11 @@ export function deploymentSettings(env) {
 }
 
 export function productionConfig(base, env, migrationsDir) {
+  assertProductionBranch(env);
   const settings = deploymentSettings(env);
   return {
     ...base,
+    account_id: deploymentAccount(env),
     name: settings.name,
     d1_databases: [{ binding: 'DB', database_name: env.TUNE_D1_DATABASE_NAME || settings.name, database_id: settings.id, migrations_dir: migrationsDir }],
     r2_buckets: [{ binding: 'BUCKET', bucket_name: settings.bucket, ...(env.TUNE_R2_JURISDICTION ? { jurisdiction: env.TUNE_R2_JURISDICTION } : {}) }],

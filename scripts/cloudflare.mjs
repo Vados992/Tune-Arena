@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { deploymentSettings } from '../web/scripts/cloudflare-config.mjs';
 import { resolveDeploymentEnvironment } from '../web/scripts/cloudflare-resources.mjs';
+import { deploymentAccount, assertProductionBranch } from '../web/scripts/cloudflare-target.mjs';
 
 const web = fileURLToPath(new URL('../web/', import.meta.url));
 const [command, ...args] = process.argv.slice(2);
@@ -11,6 +12,10 @@ const dryRun = command === 'deploy' && args.length === 1 && args[0] === '--dry-r
 let deploymentEnv = process.env;
 if (!['build', 'deploy'].includes(command) || (args.length && !dryRun)) {
   throw new Error('Usage: node scripts/cloudflare.mjs build|deploy [--dry-run]');
+}
+if (command === 'deploy') {
+  deploymentAccount(deploymentEnv);
+  assertProductionBranch(deploymentEnv);
 }
 function run(executable, arguments_) {
   const result = spawnSync(executable, arguments_, { cwd: web, env: deploymentEnv, stdio: 'inherit', shell: process.platform === 'win32' && executable.endsWith('.cmd') });
@@ -20,7 +25,7 @@ function run(executable, arguments_) {
 function npm(args) { run(process.platform === 'win32' ? 'npm.cmd' : 'npm', args); }
 
 if (command === 'build') {
-  npm(['ci', '--no-audit', '--no-fund']);
+  npm(['ci', '--include=dev', '--no-audit', '--no-fund']);
   npm(['run', 'build']);
 }
 if (!existsSync(path.join(web, 'dist/server/index.js')) || !existsSync(path.join(web, 'dist/client'))) {

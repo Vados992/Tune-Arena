@@ -100,4 +100,6 @@ node scripts/check-projects.mjs
 
 Для публикации в Cloudflare Workers Builds: Root directory `/`, Build command `npm run build:cloudflare`, Deploy command `npm run deploy:cloudflare`. [Автоматическое создание D1/R2 в Cloudflare Builds и исправление ошибок публикации](docs/CLOUDFLARE_BUILDS_RU.md).
 
+Целевой аккаунт и репозиторий зафиксированы в `config/cloudflare.json`. `npm run cloudflare:check` проверяет существующее подключение; `npm run cloudflare:repair` исправляет его production-настройки и проверяет результат. Для этих команд нужен Cloudflare API token с Workers Scripts Read и Workers Builds Configuration Edit именно для указанного аккаунта. Production-публикация из веток Dependabot и в другой аккаунт блокируется до обращения к ресурсам. GitHub Actions для этих команд не используется.
+
 Исправлены конфликт npm peer dependencies в обновлении React/RSC и установка Android SDK в CI. Связанные обновления сгруппированы в Dependabot; ручная сборка клиентов поддерживает выбор платформы. [Проверенные версии, результаты и инструкция запуска для q5hjdh792d-collab](docs/DEPENDENCY_UPDATES_RU.md).

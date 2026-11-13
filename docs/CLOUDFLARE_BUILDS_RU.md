@@ -2,6 +2,30 @@
 
 GitHub хранит исходники. Установку зависимостей, сборку и публикацию выполняет Cloudflare Workers Builds. GitHub Actions для этого процесса не нужен.
 
+## Целевой аккаунт и проверка подключения
+
+Целевой аккаунт проекта зафиксирован в `config/cloudflare.json`: **4e7eef5f6d0569a85b19cb78279e5aed**, Worker **tune-arena**, GitHub **Vados992/Tune-Arena**, production-ветка **main**. Публикация с другим `CLOUDFLARE_ACCOUNT_ID` останавливается до обращения к ресурсам, в том числе при вручную заданных D1/R2. Сгенерированный production-конфиг явно содержит правильный `account_id`. Чтобы намеренно сменить аккаунт, сначала изменить этот файл и проверить ресурсы нового аккаунта.
+
+На скриншоте с `dependabot/...`, пустым Build command и `npx wrangler preview` показана конфигурация непроизводственной ветки. Для основной версии нужны параметры из таблицы ниже. Отключить **Non-production branch builds / Previews** и запустить новую сборку **main**. Команда production-публикации дополнительно отклоняет `WORKERS_CI_BRANCH`, отличный от `main`; она не публикует ветки Dependabot в рабочую базу.
+
+Проверка уже существующего подключения:
+
+```sh
+npm run cloudflare:check
+```
+
+Для применения и повторной проверки нужных настроек:
+
+```sh
+npm run cloudflare:repair
+```
+
+Обе команды используют `CLOUDFLARE_API_TOKEN`, заданный безопасно в среде, и обращаются только к целевому аккаунту. Для этих команд нужен **пользовательский** API-токен с **Workers Scripts Read** и **Workers Builds Configuration Edit** на указанный аккаунт. Это отдельные права на управление подключением; выбранному в Cloudflare Builds токену публикации нужны Workers Scripts, D1 и R2 Edit. Токен другого аккаунта и один только его account ID доступа не дают.
+
+`cloudflare:check` только читает настройки и возвращает ненулевой код при расхождениях. `cloudflare:repair` проверяет имя Worker и ID/имя GitHub-репозитория, затем исправляет только production-ветку, команды, корневую папку, account ID в Build Variables и выключает Previews. Существующие секреты и выбранный build token сохраняются. После PATCH выполняется повторное чтение; без подтверждения результата успех не выводится. Команда не создаёт токены/Worker, не подключает другой репозиторий, не удаляет D1/R2 и не запускает публикацию. Если подключение к GitHub отсутствует, сначала выбрать репозиторий в панели Cloudflare. Права GitHub App на выбранный репозиторий подтверждает владелец в GitHub.
+
+Изменения в репозитории не меняют уже сохранённые команды в панели Cloudflare: их нужно применить через `cloudflare:repair` или Settings → Builds. Ошибка 401/403 означает, что применение не выполнено. Успешная локальная сборка сама по себе не подтверждает исправление удалённых настроек.
+
 ## Две ошибки со скриншотов
 
 - `Could not detect a directory containing static files`: выполнялся `npx wrangler deploy` из корня без сборки web-приложения.
@@ -18,12 +42,13 @@ GitHub хранит исходники. Установку зависимост�
 | Build command | `npm run build:cloudflare` |
 | Deploy command | `npm run deploy:cloudflare` |
 | Node.js | `24` (включён `.node-version`) |
+| Non-production branch builds / Previews | выключено |
 
-Сохранить команды и запустить последнюю версию `main`. Для публикации используются production-данные; непроизводственным веткам нужны отдельные ресурсы и адрес.
+В **Build Variables** можно явно задать `CLOUDFLARE_ACCOUNT_ID=4e7eef5f6d0569a85b19cb78279e5aed`; при отсутствии переменной скрипт берёт этот ID из `config/cloudflare.json`. Сохранить команды и запустить последнюю версию `main`. Для публикации используются production-данные. Сборка явно устанавливает devDependencies, включая Vite и Wrangler, даже при `NODE_ENV=production`.
 
 ## Автоматическая настройка D1/R2
 
-Команда публикации использует `CLOUDFLARE_API_TOKEN` и `CLOUDFLARE_ACCOUNT_ID` в среде **Cloudflare Builds**. Выбранный в **Settings → Build → API token** токен должен иметь права на Workers Scripts, D1 и Workers R2 Storage (Edit/Write). Если ID аккаунта не передаётся средой сборки, добавить `CLOUDFLARE_ACCOUNT_ID` в **Build Variables and Secrets**. Значение — ID выбранного аккаунта Cloudflare, не ID базы D1. Токен не передавать в переписке и не сохранять в исходниках.
+Команда публикации использует `CLOUDFLARE_API_TOKEN` в среде **Cloudflare Builds**. Выбранный в **Settings → Build → API token** токен должен иметь права на Workers Scripts, D1 и Workers R2 Storage (Edit/Write). ID берётся из `config/cloudflare.json`; при явном указании `CLOUDFLARE_ACCOUNT_ID` в **Build Variables and Secrets** он должен совпадать с конфигурацией проекта. Это ID аккаунта Cloudflare, не ID базы D1. Токен не передавать в переписке и не сохранять в исходниках.
 
 Во время публикации скрипт:
 
