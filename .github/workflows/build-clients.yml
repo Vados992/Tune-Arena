@@ -64,7 +64,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
       - name: Install Android command-line tools and SDK packages
         uses: android-actions/setup-android@v4
         with:
