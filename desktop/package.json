@@ -14,7 +14,7 @@
     "pack:linux": "electron-builder --linux dir --config build-config.cjs --publish never"
   },
   "devDependencies": {
-    "electron": "45.2.3",
+    "electron": "45.3.2",
     "electron-builder": "26.18.0"
   }
 }
